@@ -237,18 +237,18 @@ def curate_golden_set():
                 golden_reason = "General brand feedback or polite commentary can be acknowledged empathetically without human intervention."
 
         return {
-            "id": f"GOLDEN-{index+1:03d}",
+            "id": f"CANDIDATE-{index+1:03d}",
             "conversation_id": cid,
             "customer_text": c_text,
-            "golden_intent": golden_intent,
+            "proposed_intent": golden_intent,
             "all_applicable_intents": all_matches if all_matches else [golden_intent],
             "difficulty_tier": tier,
-            "golden_triage": golden_triage,
-            "golden_escalation_category": golden_cat,
-            "golden_escalation_reason": golden_reason,
+            "proposed_triage": golden_triage,
+            "proposed_escalation_category": golden_cat,
+            "proposed_escalation_reason": golden_reason,
             "historical_brand_reply": s_reply,
-            "human_verified": True,
-            "annotation_notes": f"Verified under Hiver @AmazonHelp guidelines. Tier: {tier}. Multi-intents: {len(all_matches)}."
+            "human_verified": False,
+            "audit_status": "Candidate sampled for human review; not verified ground-truth."
         }
 
     idx = 0
@@ -262,9 +262,9 @@ def curate_golden_set():
         golden_examples.append(label_example(r, "adversarial", idx))
         idx += 1
 
-    # Save outputs
-    json_path = GOLDEN_DATA_DIR / "golden_eval_set.json"
-    csv_path = GOLDEN_DATA_DIR / "golden_eval_set.csv"
+    # Save candidates to candidate pool (does not overwrite human-audited golden_eval_set.json)
+    json_path = GOLDEN_DATA_DIR / "candidate_eval_pool.json"
+    csv_path = GOLDEN_DATA_DIR / "candidate_eval_pool.csv"
     
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(golden_examples, f, indent=2, ensure_ascii=False)
@@ -272,7 +272,7 @@ def curate_golden_set():
     df_golden = pd.DataFrame(golden_examples)
     df_golden.to_csv(csv_path, index=False, encoding="utf-8")
     
-    print(f"\n[Phase 3 Complete] Saved 200 golden examples to:")
+    print(f"\n[Candidate Sampler Complete] Saved 200 candidates for human audit to:")
     print(f"  JSON: {json_path}")
     print(f"  CSV : {csv_path}")
     

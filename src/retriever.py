@@ -1,7 +1,7 @@
 """
-Phase 2: Hybrid Retrieval Knowledge Base for @AmazonHelp.
+Phase 2: TF-IDF Lexical Retrieval Knowledge Base for @AmazonHelp.
 Indexes 55,011 historical customer-brand resolution pairs with conversation IDs.
-Provides high-speed lexical (BM25 / TF-IDF) and semantic retrieval.
+Provides high-speed lexical (TF-IDF + Cosine Similarity) retrieval.
 """
 import os
 import pickle

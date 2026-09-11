@@ -117,16 +117,16 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 | Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5847` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.5192` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
-| **Missed Escalation Rate** | `1.0000` | `0.4808` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
-| **False Escalation Rate** | `0.0000` | `0.5104` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9387` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9350` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.5243` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
-| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
-| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage compliance with active sanitizer |
-| **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1037`** | Lexical overlap against historical 2017 tweets |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.8650`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
+| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% compliance with deterministic PII-safety rules (zero credential solicitation) |
+| **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1033`** | Lexical overlap against historical 2017 tweets |
 
 ### Performance Breakdown Across Difficulty Tiers (Macro-F1)
 
@@ -138,25 +138,35 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 ---
 
-## 5. LLM-as-a-Judge Rubric & Human Calibration
+## 5. Automated Multi-Criteria Quality Rubric & Reply Evaluation
 
-To evaluate grounded reply quality without relying on superficial n-gram metrics, we deployed a 4-criteria judge evaluating:
-1. **Groundedness & Factual Realism (1–5)**: Consistency with historical resolution behaviors.
-2. **Brand Voice & Empathy (1–5)**: Adherence to Amazon's courteous, concise, signature tone.
-3. **Actionability (1–5)**: Provision of unambiguous next steps (self-serve portal vs. secure DM).
-4. **Channel & PII Safety (1–5)**: Refusal to request credentials or order numbers on public feeds.
+Rather than relying purely on superficial n-gram overlap metrics (such as BLEU or ROUGE, which heavily penalize valid lexical variation), reply generation is evaluated using an explicit, deterministic multi-criteria quality rubric implemented in `src/llm_judge.py` (`ReplyQualityRubric`).
 
-### Human-Judge Calibration Benchmark (50 Hand-Annotated Pairs)
-To verify judge reliability against human domain experts, we conducted an agreement study on 50 representative pairs:
+### Evaluation Dimensions (1–5 Scale)
+1. **Groundedness & Factual Realism (1–5)**:
+   Assesses whether the response accurately incorporates resolution concepts matching the customer's specific problem category (e.g., dispatch tracking for delays, prepaid return labels for refunds, carrier tracing for stolen packages).
+2. **Brand Voice & Empathy (1–5)**:
+   Measures courteous, brand-aligned sign-offs (e.g., `^CS`, `^GR`) and empathetic acknowledgment (*"Sorry to hear"*, *"We want to make this right"*), matching `@AmazonHelp` historical norms.
+3. **Actionability & Resolution Guidance (1–5)**:
+   Measures whether the customer is provided an unambiguous, concrete next step (e.g., self-service account portal link `[link]` for routine tasks, or a secure private direct message handoff for escalations).
+4. **Channel & PII Safety (1–5)**:
+   Strict zero-tolerance gate: penalizes public solicitation of passwords, full credit card numbers, CVVs, or sensitive credentials on public social channels.
 
-- **Exact Agreement**: `96.0%`
-- **Agreement within $\pm 1$ Point**: `100.0%`
-- **Cohen's Quadratic Weighted Kappa ($\kappa$)**: **`0.9099`** (indicating strong human-judge alignment)
-- **Spearman Rank Correlation**: **`0.9491`** ($p = 9.85 \times 10^{-26}$)
+### Pass/Fail Criteria
+A response is scored as a **Pass** if:
+- `channel_safety == 5` (zero credential solicitation)
+- `groundedness >= 4`
+- `actionability >= 4`
+- `overall_score >= 3.8`
 
-### Qualitative Disagreement Analysis
-- **Disagreement 1 (`GOLDEN-191`, High Friction)**: Customer submitted a sarcastic, furious tweet regarding a broken shipment. The judge awarded 5/5 due to complete keyword grounding and DM link presence. The human reviewer marked it down to 4/5 because the standardized empathy opener (*"This is definitely not the standard we aim to deliver"*) reads as sterile and robotic to an agitated user.
-- **Disagreement 2 (Concise FAQ)**: On an ultra-brief inquiry (*"how do I return shoes"*), the human evaluator gave 5/5 for an instant, direct self-service link, whereas the judge awarded 4/5 due to the absence of a multi-sentence conversational opening.
+Under this rubric:
+- **Baseline 0 (Trivial Constant Reply)**: `0.0%` pass rate (lacks intent-specific grounding and actionability).
+- **Baseline 1 (Simple 1-NN Retrieval)**: `8.5%` pass rate (historical raw tweets frequently contain broken links, incomplete context, or missing empathy markers).
+- **Proposed AI Agent**: **`86.5%`** pass rate (structured, grounded response generation with dynamic brand voice and verified self-service/escalation paths).
+
+### Note on Human Calibration in this Prototype
+> [!NOTE]
+> To maintain strict methodological transparency, we explicitly note that an independent multi-annotator human calibration study (e.g., Cohen's Kappa or Spearman correlation against rater panels) was **not conducted** for this prototype. The rubric serves as an automated, transparent, rule-based regression test suite. Conducting an extensive human rater calibration study and evaluating against fine-tuned judge models is scoped as a priority for production deployment.
 
 ---
 
@@ -210,8 +220,8 @@ A headline metric of **`0.9519` Escalation Recall** and **`0.9495` Safe Auto-Han
    Classifying a tweet correctly as `DELIVERY_STATUS_DELAY` does not mean the customer was satisfied. If the carrier lost the shipment, sending a generic tracking link merely delays customer frustration.
 5. **Historical Dataset Vintage (2017 vs. Present)**:
    The TWCS dataset reflects Twitter policies and operational workflows from 2017. Modern customer service relies on rich in-app messaging, automated authentication handoffs, and updated returns portals that did not exist when these tweets were authored.
-6. **LLM Judge Inherent Self-Preference**:
-   While calibrated against human raters with a high Kappa ($\kappa = 0.9099$), automated LLM judges exhibit subtle structural biases toward grammatical completeness and polite boilerplate, occasionally penalizing direct brevity.
+6. **Automated Rubric vs. Nuanced Human Judgment**:
+   Our reply evaluation relies on a transparent, deterministic multi-criteria rubric (`ReplyQualityRubric`) rather than human panels or opaque LLM judge APIs. While deterministic rubrics provide 100% reproducible and fast regression checks, they cannot detect subtle conversational nuances, natural human empathy variation, or brand tone subtleties as effectively as calibrated human review panels.
 
 ---
 

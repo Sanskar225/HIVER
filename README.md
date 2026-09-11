@@ -15,20 +15,19 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 
 | Evaluation Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5847` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.5192` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
-| **Missed Escalation Rate** | `1.0000` | `0.4808` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
-| **False Escalation Rate** | `0.0000` | `0.5104` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9387` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9350` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.5243` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
-| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
-| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage public channel privacy compliance |
-| **Judge-Human Agreement ($\kappa$)**| N/A | N/A | **`0.9099`** | Calibrated Quadratic Weighted Kappa on 50 hand-annotated pairs |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.8650`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
+| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% compliance with deterministic PII-safety rules (zero credential solicitation) |
 
 ### Key Finding
 > **Deterministic safety guardrails prevent operational disasters.**  
-> While simple keyword models miss over **48% of escalations**, our deterministic triage engine reduces the Missed Escalation Rate to **4.81%**, substantially improving coverage of stolen-package, account-security, and financial-risk cases.
+> While simple keyword models miss over **61% of escalations**, our deterministic triage engine reduces the Missed Escalation Rate to **4.81%**, substantially improving coverage of stolen-package, account-security, and financial-risk cases.
 
 ### Biggest Limitation
 > **Historical data is evidence of past behavior, not current policy.**  
@@ -48,16 +47,22 @@ cd HIVER
 pip install -r requirements.txt
 ```
 
-### 2. Run the Full Evaluation Pipeline (Typically < 1 Minute)
+### 2. Run the Automated Pytest Suite (21 Verification Tests)
+```bash
+python -m pytest tests/ -v
+```
+Executes in ~5 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, reply sanitization, and rubric scoring.
+
+### 3. Run the Full Evaluation Pipeline (Typically < 1 Minute)
 ```bash
 python run_pipeline.py
 ```
-This executes predictions across all 200 Golden Evaluation examples for Baseline 0, Baseline 1, and the Proposed Agent, evaluates LLM-as-a-judge criteria, computes calibration statistics, and outputs:
+This executes predictions across all 200 Golden Evaluation examples for Baseline 0, Baseline 1, and the Proposed Agent, evaluates deterministic reply quality rubric criteria, and outputs:
 - `artifacts/evaluation_metrics.json`
 - `artifacts/headline_results_table.md`
 - `artifacts/confusion_matrix_*.png`
 
-### 3. Interactive CLI Demo (Try It Live!)
+### 4. Interactive CLI Demo (Try It Live!)
 ```bash
 python -m src.cli "My package says delivered yesterday but it was never left on my porch!"
 ```
@@ -127,14 +132,21 @@ HIVER/
 ├── README.md                      # Marketing page, quickstart, and headline benchmark table
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
 ├── DECISION_LOG.md                # 16 non-obvious engineering decisions and their rationales
-├── requirements.txt               # Lightweight Python dependencies
+├── requirements.txt               # Lightweight Python dependencies (including pytest)
 ├── run_pipeline.py                # Master reproduction script (typically < 1 minute)
+│
+├── tests/                         # Full automated test suite (21 unit & safety tests)
+│   ├── test_agent.py              # End-to-end agent behavior, routing & credential sanitization
+│   ├── test_data_leakage.py       # Zero conversation ID & customer text overlap checks
+│   ├── test_evaluator.py          # Metric calculations & deterministic reply rubric tests
+│   ├── test_retriever.py          # TF-IDF retrieval accuracy & sub-100ms latency SLA
+│   └── test_taxonomy.py           # Hierarchy priority & collision resolution checks
 │
 ├── data/
 │   ├── raw/                       # Original multi-turn conversation dataset
 │   ├── processed/
 │   │   ├── kb_corpus.parquet      # 55,011 historical @AmazonHelp resolution pairs (leak-free)
-│   │   └── golden_candidate_pool  # Strictly disjoint evaluation candidate pool
+│   │   └── candidate_eval_pool    # Candidate evaluation sampling pool (unverified)
 │   └── golden/
 │       ├── golden_eval_set.json   # 200 hand-verified stratified evaluation cases
 │       └── golden_eval_set.csv    # Tabular CSV export of golden evaluation suite
@@ -143,11 +155,11 @@ HIVER/
 │   ├── config.py                  # Taxonomy definitions, paths, and constants
 │   ├── data_prep.py               # Leakage-free dataset parsing and partitioning
 │   ├── taxonomy.py                # 8-intent definitions, priority hierarchy & safety rules
-│   ├── retriever.py               # Fast TF-IDF / BM25 historical case search index
+│   ├── retriever.py               # Fast TF-IDF historical case search index (<100ms SLA)
 │   ├── agent.py                   # Production-minded AI Support Agent with response sanitizer
 │   ├── baselines.py               # Baseline 0 (Trivial) and Baseline 1 (Simple)
 │   ├── evaluator.py               # Macro-F1, safety triage metrics, and confusion plotting
-│   ├── llm_judge.py               # LLM-as-a-judge rubric & human calibration engine
+│   ├── llm_judge.py               # Deterministic 4-criteria reply quality rubric
 │   ├── failure_analysis.py        # Automated isolation of real edge failures
 │   ├── audit_and_fix.py           # Independent ground-truth relabeling and taxonomy audit
 │   └── cli.py                     # Interactive terminal console for live testing
@@ -156,7 +168,6 @@ HIVER/
     ├── evaluation_metrics.json    # Complete JSON dump of all computed metrics
     ├── headline_results_table.md  # Clean Markdown benchmark summary
     ├── failure_analysis.json      # Structured log of all failure edge cases
-    ├── judge_human_calibration.json # Agreement metrics and disagreement cases
     ├── confusion_matrix_proposed_agent.png
     ├── confusion_matrix_simple_baseline.png
     └── confusion_matrix_trivial_baseline.png

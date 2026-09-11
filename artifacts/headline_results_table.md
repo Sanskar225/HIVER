@@ -16,8 +16,8 @@
 | **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (queue cost / human agent burden) |
 | **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | Coverage of critical security/financial risks |
 | **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Cleanliness of human triage queue |
-| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
-| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | Zero-leakage compliance (protecting customer identity) |
+| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.8650`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
+| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | Deterministic rule compliance (zero credential solicitation) |
 | **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1033`** | Lexical alignment with historical Amazon resolutions |
 
 ---
@@ -29,12 +29,3 @@
 | **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9796`** | Baseline reference |
 | **Difficult Cases** | 40 | `0.0081` | `0.8306` | **`1.0000`** | Nuanced multi-intent queries |
 | **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | High-friction / sarcasm / hostility |
-
----
-
-### 3. Human vs. LLM Judge Calibration Benchmark (50 Pairs)
-
-- **Exact Agreement**: `96.0%`
-- **Agreement within $\pm 1$ Point**: `100.0%`
-- **Cohen's Quadratic Weighted Kappa**: `0.9099`
-- **Spearman Rank Correlation**: `0.9491` (p = `9.85e-26`)

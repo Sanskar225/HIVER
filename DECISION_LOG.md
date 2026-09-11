@@ -52,9 +52,9 @@ This document records the **16 non-obvious engineering decisions** made during t
 - **Decision**: Hand-verified all 200 golden evaluation items rather than accepting pure LLM pseudo-labels.
 - **Why**: LLMs have known systematic failure modes on sarcasm, typos, and adversarial prompts. Golden evaluation sets must reflect human ground truth to be scientifically valid.
 
-### 13. Calibration of LLM Judge with Quadratic Weighted Cohen's Kappa
-- **Decision**: Validated the automated LLM judge against 50 hand-annotated human ratings, reporting Quadratic Weighted Kappa ($\kappa = 0.9099$), Spearman correlation ($0.9491$), and explicit qualitative disagreement cases.
-- **Why**: Simply asserting that an LLM judge was used is insufficient. Proving human-judge alignment provides the scientific defensibility required by Hiver.
+### 13. Transparent Deterministic Reply Rubric over Unverified LLM-as-a-Judge
+- **Decision**: Implemented an explicit, deterministic 4-criteria reply quality rubric (`ReplyQualityRubric` evaluating Groundedness, Brand Voice, Actionability, and Channel/PII Safety) rather than making unverified external LLM-as-a-judge API claims or fabricating synthetic calibration statistics.
+- **Why**: An offline prototype without runtime LLM dependencies must remain strictly honest about what is deterministic code vs. human judgment. The deterministic rubric provides 100% reproducible, fast, and transparent regression grading on public channel safety and grounded guidance, while multi-annotator human rater calibration is explicitly scoped for future production deployment.
 
 ### 14. 100% Offline Self-Contained Reproduction Pipeline
 - **Decision**: Engineered the pipeline to run fully locally in under 1 minute without mandatory external API keys.
@@ -66,4 +66,4 @@ This document records the **16 non-obvious engineering decisions** made during t
 
 ### 16. Retrieval-Conditioned Canonical Reply Synthesis vs. Raw Text Replay vs. Unconstrained Generative LLM
 - **Decision**: Implemented reply drafting via *Retrieval-Conditioned Canonical Synthesis* rather than either raw 1-NN text replay (as in Baseline 1) or an unconstrained generative LLM prompt. The system retrieves historical resolution evidence from 55,011 cases to extract historical agent voice tags (`^CS`, `^GR`, etc.), resolution channel cues, and relevance context, but populates a deterministic, policy-safe response with guaranteed link anchors (`[link]`) and active privacy sanitization.
-- **Why**: As proven by Baseline 1, raw historical tweet retrieval achieves a miserable **8.5% pass rate** on the LLM judge because historical tweets contain dead 2017 links (`t.co`), stale policies, and lack required privacy warnings. Conversely, an unconstrained generative LLM introduces severe risks of hallucinating specific corporate guarantees (such as promising 'free replacements' or quoting specific internal warranty terms). Retrieval-conditioned canonical synthesis grounds the agent in historical evidence while maintaining strict, auditable enterprise safety boundaries.
+- **Why**: As proven by Baseline 1, raw historical tweet retrieval achieves a miserable **8.5% pass rate** on the reply quality rubric because historical tweets contain dead 2017 links (`t.co`), stale policies, and lack required privacy warnings. Conversely, an unconstrained generative LLM introduces severe risks of hallucinating specific corporate guarantees (such as promising 'free replacements' or quoting specific internal warranty terms). Retrieval-conditioned canonical synthesis grounds the agent in historical evidence while maintaining strict, auditable enterprise safety boundaries.

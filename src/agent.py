@@ -245,7 +245,14 @@ class AmazonSupportAgent:
         - Appends brand sign-off if omitted.
         """
         # Strip any accidental plain-text requests for sensitive credentials
-        cleaned = re.sub(r"\b(please\s+(tweet|post|share)\s+your\s+(credit card|cvv|password))\b", "please connect privately via [link]", reply, flags=re.I)
+        cleaned = re.sub(
+            r"\b(please\s+(tweet|post|share|send|provide)\s+(us\s+)?(your\s+)?(credit card|cvv|password|full card number|card details))\b.*", 
+            "please connect privately via our secure link [link]", 
+            reply, 
+            flags=re.I
+        )
+        # Redact any remaining direct sensitive credential mentions
+        cleaned = re.sub(r"\b(credit card|cvv|password|full card number)\b", "[redacted]", cleaned, flags=re.I)
         # Ensure agent initial tag exists
         if not re.search(r"\^[a-zA-Z]{2,3}$", cleaned.strip()):
             cleaned = cleaned.strip() + " ^CS"

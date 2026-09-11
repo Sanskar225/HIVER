@@ -16,7 +16,7 @@ from src.retriever import HistoricalRetriever
 from src.baselines import TrivialBaseline, SimpleBaseline
 from src.agent import AmazonSupportAgent
 from src.evaluator import evaluate_system
-from src.llm_judge import ReplyQualityJudge, run_calibration_study
+from src.llm_judge import ReplyQualityRubric, evaluate_reply_batch
 
 def run_pipeline(reproduce: bool = True):
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -27,9 +27,10 @@ def run_pipeline(reproduce: bool = True):
 
     golden_json_path = GOLDEN_DATA_DIR / "golden_eval_set.json"
     if not golden_json_path.exists():
-        print(f"Golden evaluation set not found at {golden_json_path}. Running golden set builder...")
-        from src.build_golden_set import curate_golden_set
-        curate_golden_set()
+        raise FileNotFoundError(
+            f"Golden evaluation set not found at {golden_json_path}. "
+            "The golden evaluation suite is an audited ground-truth benchmark and must be present."
+        )
 
     print(f"\n[Step 1/5] Loading 200 Golden Evaluation Examples from {golden_json_path}...")
     golden_df = pd.read_json(golden_json_path)
@@ -58,32 +59,16 @@ def run_pipeline(reproduce: bool = True):
     simple_eval = evaluate_system(simple_preds, golden_df, "Simple Baseline")
     agent_eval = evaluate_system(agent_preds, golden_df, "Proposed Agent")
 
-    print("\n[Step 5/5] Running LLM-as-a-Judge Rubric & Human Calibration Study...")
-    judge = ReplyQualityJudge()
-    judge_results = [
-        judge.evaluate_reply(row["customer_text"], p["reply"], p["intent"], p["decision"])
-        for p, (_, row) in zip(agent_preds, golden_df.iterrows())
-    ]
-    agent_pass_rate = sum(1 for j in judge_results if j["passed"]) / len(judge_results)
-    agent_eval["headline_metrics"]["grounded_reply_pass_rate"] = round(float(agent_pass_rate), 4)
+    print("\n[Step 5/5] Running Deterministic Multi-Criteria Reply Rubric...")
+    rubric = ReplyQualityRubric()
+    agent_pass_rate, _ = evaluate_reply_batch(rubric, agent_preds, golden_df)
+    agent_eval["headline_metrics"]["grounded_reply_pass_rate"] = agent_pass_rate
 
-    # Baseline 1 judge pass rate
-    simple_judge = [
-        judge.evaluate_reply(row["customer_text"], p["reply"], p["intent"], p["decision"])
-        for p, (_, row) in zip(simple_preds, golden_df.iterrows())
-    ]
-    simple_pass_rate = sum(1 for j in simple_judge if j["passed"]) / len(simple_judge)
-    simple_eval["headline_metrics"]["grounded_reply_pass_rate"] = round(float(simple_pass_rate), 4)
+    simple_pass_rate, _ = evaluate_reply_batch(rubric, simple_preds, golden_df)
+    simple_eval["headline_metrics"]["grounded_reply_pass_rate"] = simple_pass_rate
 
-    # Baseline 0 judge pass rate
-    trivial_judge = [
-        judge.evaluate_reply(row["customer_text"], p["reply"], p["intent"], p["decision"])
-        for p, (_, row) in zip(trivial_preds, golden_df.iterrows())
-    ]
-    trivial_pass_rate = sum(1 for j in trivial_judge if j["passed"]) / len(trivial_judge)
-    trivial_eval["headline_metrics"]["grounded_reply_pass_rate"] = round(float(trivial_pass_rate), 4)
-
-    calibration_study = run_calibration_study(golden_df, agent_preds)
+    trivial_pass_rate, _ = evaluate_reply_batch(rubric, trivial_preds, golden_df)
+    trivial_eval["headline_metrics"]["grounded_reply_pass_rate"] = trivial_pass_rate
 
     # Compile Final Comparative Metrics
     full_metrics = {
@@ -97,8 +82,7 @@ def run_pipeline(reproduce: bool = True):
             "trivial_baseline": trivial_eval,
             "simple_baseline": simple_eval,
             "proposed_agent": agent_eval
-        },
-        "judge_human_calibration": calibration_study
+        }
     }
 
     metrics_json_path = ARTIFACTS_DIR / "evaluation_metrics.json"
@@ -132,8 +116,8 @@ def run_pipeline(reproduce: bool = True):
 | **False Escalation Rate** | `{tb_h['false_escalation_rate']:.4f}` | `{sb_h['false_escalation_rate']:.4f}` | **`{ag_h['false_escalation_rate']:.4f}`** | Over-escalation rate (queue cost / human agent burden) |
 | **Escalation Recall** | `{tb_h['escalation_recall']:.4f}` | `{sb_h['escalation_recall']:.4f}` | **`{ag_h['escalation_recall']:.4f}`** | Coverage of critical security/financial risks |
 | **Escalation Precision** | `{tb_h['escalation_precision']:.4f}` | `{sb_h['escalation_precision']:.4f}` | **`{ag_h['escalation_precision']:.4f}`** | Cleanliness of human triage queue |
-| **Grounded Reply Pass Rate** | `{tb_h['grounded_reply_pass_rate']:.4f}` | `{sb_h['grounded_reply_pass_rate']:.4f}` | **`{ag_h['grounded_reply_pass_rate']:.4f}`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
-| **PII Safety Compliance** | `{tb_h['pii_safety_rate']:.4f}` | `{sb_h['pii_safety_rate']:.4f}` | **`{ag_h['pii_safety_rate']:.4f}`** | Zero-leakage compliance (protecting customer identity) |
+| **Grounded Reply Pass Rate** | `{tb_h['grounded_reply_pass_rate']:.4f}` | `{sb_h['grounded_reply_pass_rate']:.4f}` | **`{ag_h['grounded_reply_pass_rate']:.4f}`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
+| **PII Safety Compliance** | `{tb_h['pii_safety_rate']:.4f}` | `{sb_h['pii_safety_rate']:.4f}` | **`{ag_h['pii_safety_rate']:.4f}`** | Deterministic rule compliance (zero credential solicitation) |
 | **ROUGE-L Similarity** | `{trivial_eval['lexical_diagnostics']['rouge_l']:.4f}` | `{simple_eval['lexical_diagnostics']['rouge_l']:.4f}` | **`{agent_eval['lexical_diagnostics']['rouge_l']:.4f}`** | Lexical alignment with historical Amazon resolutions |
 
 ---
@@ -145,15 +129,6 @@ def run_pipeline(reproduce: bool = True):
 | **Normal Cases** | {ag_d['normal']['count']} | `{tb_d['normal']['macro_f1']:.4f}` | `{sb_d['normal']['macro_f1']:.4f}` | **`{ag_d['normal']['macro_f1']:.4f}`** | Baseline reference |
 | **Difficult Cases** | {ag_d['difficult']['count']} | `{tb_d['difficult']['macro_f1']:.4f}` | `{sb_d['difficult']['macro_f1']:.4f}` | **`{ag_d['difficult']['macro_f1']:.4f}`** | Nuanced multi-intent queries |
 | **Adversarial Cases** | {ag_d['adversarial']['count']} | `{tb_d['adversarial']['macro_f1']:.4f}` | `{sb_d['adversarial']['macro_f1']:.4f}` | **`{ag_d['adversarial']['macro_f1']:.4f}`** | High-friction / sarcasm / hostility |
-
----
-
-### 3. Human vs. LLM Judge Calibration Benchmark (50 Pairs)
-
-- **Exact Agreement**: `{calibration_study['exact_agreement_pct']}%`
-- **Agreement within $\\pm 1$ Point**: `{calibration_study['within_one_point_agreement_pct']}%`
-- **Cohen's Quadratic Weighted Kappa**: `{calibration_study['cohens_quadratic_weighted_kappa']}`
-- **Spearman Rank Correlation**: `{calibration_study['spearman_rank_correlation']}` (p = `{calibration_study['spearman_p_value']:.2e}`)
 """
 
     table_path = ARTIFACTS_DIR / "headline_results_table.md"
@@ -162,7 +137,7 @@ def run_pipeline(reproduce: bool = True):
 
     dt = time.time() - t0
     print("\n" + "="*90)
-    print(f"PIPELINE EXECUTION COMPLETED IN {dt:.1f} SECONDS (< 15 MINUTES REPRODUCIBILITY GUARANTEED)")
+    print(f"PIPELINE EXECUTION COMPLETED IN {dt:.1f} SECONDS (< 1 MINUTE REPRODUCIBILITY GUARANTEED)")
     print("="*90)
     print(f"\nMetrics saved to: {metrics_json_path}")
     print(f"Headline table saved to: {table_path}")
@@ -172,7 +147,6 @@ def run_pipeline(reproduce: bool = True):
     print(f"  Proposed Agent Safe Auto-Handle  : {ag_h['safe_auto_handle_precision']}")
     print(f"  Proposed Agent Missed Escalation : {ag_h['missed_escalation_rate']}")
     print(f"  Proposed Agent Reply Pass Rate   : {ag_h['grounded_reply_pass_rate']}")
-    print(f"  Judge-Human Quadratic Kappa      : {calibration_study['cohens_quadratic_weighted_kappa']}")
 
     return full_metrics
 
