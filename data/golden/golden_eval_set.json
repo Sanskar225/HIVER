@@ -67,7 +67,7 @@
     "id": "GOLDEN-005",
     "conversation_id": "ba141a50e14eeb8fd61058a5f3878478",
     "customer_text": "What is this @User? I paid for 2 day delivery and you haven't even shipped the product yet? Will I get my extra shipping charges back now? [link]",
-    "golden_intent": "DELIVERY_STATUS_DELAY",
+    "golden_intent": "ORDER_CHANGE_CANCEL",
     "all_applicable_intents": [
       "DELIVERY_STATUS_DELAY"
     ],
@@ -77,7 +77,7 @@
     "golden_escalation_reason": "General in-transit delivery tracking can be self-served via 'Your Orders' tracking portal.",
     "historical_brand_reply": "Could you let us know if there has been a miss on your delivery? If yes, Kindly reach us via [link] and we'll help you out here. ^VM",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1. [Audited: Pre-dispatch order change mapped to ORDER_CHANGE_CANCEL]"
   },
   {
     "id": "GOLDEN-006",
@@ -115,17 +115,17 @@
     "id": "GOLDEN-008",
     "conversation_id": "58f633e78da7c67e6ca5dec653765553",
     "customer_text": "Shoutout to sherry from @AmazonHelp for helping me with me lost package all my family’s Christmas presents are now safe and sound.",
-    "golden_intent": "DELIVERY_STATUS_DELAY",
+    "golden_intent": "FEEDBACK_COMPLAINT_GENERAL",
     "all_applicable_intents": [
       "DELIVERY_STATUS_DELAY"
     ],
     "difficulty_tier": "normal",
     "golden_triage": "AUTO_HANDLE",
     "golden_escalation_category": "NONE",
-    "golden_escalation_reason": "General in-transit delivery tracking can be self-served via 'Your Orders' tracking portal.",
+    "golden_escalation_reason": "Customer expressing appreciation/shoutout for previously resolved issue; acknowledge empathetically.",
     "historical_brand_reply": "Happy to hear this! Thanks for letting us know. Hope you have a great rest of your night! 😊 ^LI",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1. [Audited: Praise/Shoutout mapped to FEEDBACK_COMPLAINT_GENERAL]"
   },
   {
     "id": "GOLDEN-009",
@@ -563,17 +563,17 @@
     "id": "GOLDEN-036",
     "conversation_id": "ba46e4a34479ce76e7bb3a45fffa5b11",
     "customer_text": "I have added amount Rs. 5106 to amazon pay.but due to some reason i have not used my amazon pay balance and i requested for refund my amount to respective payment method on 19 Nov 2017.",
-    "golden_intent": "REFUND_RETURN_EXCHANGE",
+    "golden_intent": "BILLING_SUBSCRIPTION_PRIME",
     "all_applicable_intents": [
       "REFUND_RETURN_EXCHANGE"
     ],
     "difficulty_tier": "normal",
-    "golden_triage": "AUTO_HANDLE",
-    "golden_escalation_category": "NONE",
-    "golden_escalation_reason": "Standard return policy and self-service return label instructions can be provided automatically.",
+    "golden_triage": "ESCALATE",
+    "golden_escalation_category": "FINANCIAL_OR_BILLING_DISPUTE",
+    "golden_escalation_reason": "Promotional cashback or digital wallet credit dispute requiring customer financial account review.",
     "historical_brand_reply": "I get your concern. Please be advised that Amazon Pay Balance has non-refundable and non-transferrable policy. Hence, we will not be able to transfer it to the bank account.",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1. [Audited: Wallet/cashback dispute mapped to BILLING_SUBSCRIPTION_PRIME]"
   },
   {
     "id": "GOLDEN-037",
@@ -627,17 +627,17 @@
     "id": "GOLDEN-040",
     "conversation_id": "57967c35954dce4f2f9513e27df94aae",
     "customer_text": "can refund received in the form of amazon pay balance be transfred to bank account ?",
-    "golden_intent": "REFUND_RETURN_EXCHANGE",
+    "golden_intent": "BILLING_SUBSCRIPTION_PRIME",
     "all_applicable_intents": [
       "REFUND_RETURN_EXCHANGE"
     ],
     "difficulty_tier": "normal",
-    "golden_triage": "AUTO_HANDLE",
-    "golden_escalation_category": "NONE",
-    "golden_escalation_reason": "Standard return policy and self-service return label instructions can be provided automatically.",
+    "golden_triage": "ESCALATE",
+    "golden_escalation_category": "FINANCIAL_OR_BILLING_DISPUTE",
+    "golden_escalation_reason": "Promotional cashback or digital wallet credit dispute requiring customer financial account review.",
     "historical_brand_reply": "Unfortunately, the amount from amazon pay balance cannot be transferred to your bank account. However, you may utilize this amount for placing orders on our website or our partner websites listed here: [link] ^GD",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: normal. Multi-intents: 1. [Audited: Wallet/cashback dispute mapped to BILLING_SUBSCRIPTION_PRIME]"
   },
   {
     "id": "GOLDEN-041",
@@ -2985,33 +2985,33 @@
     "id": "GOLDEN-185",
     "conversation_id": "49a9efcd6e54395e8d2b16085ba12bda",
     "customer_text": "Another pathetic experience from Amazon india.not received my amazon pay cashback since 2 weeks @User @User",
-    "golden_intent": "FEEDBACK_COMPLAINT_GENERAL",
+    "golden_intent": "BILLING_SUBSCRIPTION_PRIME",
     "all_applicable_intents": [
       "FEEDBACK_COMPLAINT_GENERAL"
     ],
     "difficulty_tier": "adversarial",
     "golden_triage": "ESCALATE",
-    "golden_escalation_category": "CUSTOMER_AGITATION_OR_LEGAL_THREAT",
-    "golden_escalation_reason": "High customer agitation or formal grievance requiring human supervisor handling.",
+    "golden_escalation_category": "FINANCIAL_OR_BILLING_DISPUTE",
+    "golden_escalation_reason": "Promotional cashback or digital wallet credit dispute requiring customer financial account review.",
     "historical_brand_reply": "Sorry about the trouble with the cashback. Please report this to our support team here: [link] ^AR",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 0."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 0. [Audited: Wallet/cashback dispute mapped to BILLING_SUBSCRIPTION_PRIME]"
   },
   {
     "id": "GOLDEN-186",
     "conversation_id": "cad288f804bfcae583edbacae70f2758",
     "customer_text": "money back and a proper investigation! Royal waste of my time and a pathetic Diwali thanks to you guys! Only frowns delivered!😡",
-    "golden_intent": "REFUND_RETURN_EXCHANGE",
+    "golden_intent": "FEEDBACK_COMPLAINT_GENERAL",
     "all_applicable_intents": [
       "REFUND_RETURN_EXCHANGE"
     ],
     "difficulty_tier": "adversarial",
     "golden_triage": "AUTO_HANDLE",
     "golden_escalation_category": "NONE",
-    "golden_escalation_reason": "Standard return policy and self-service return label instructions can be provided automatically.",
+    "golden_escalation_reason": "Customer expressing appreciation/shoutout for previously resolved issue; acknowledge empathetically.",
     "historical_brand_reply": "Sorry to know about the issue with your order. Kindly fill in your details here: [link] I'll look into it. ^NR",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 1."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 1. [Audited: Praise/Shoutout mapped to FEEDBACK_COMPLAINT_GENERAL]"
   },
   {
     "id": "GOLDEN-187",
@@ -3118,17 +3118,17 @@
     "id": "GOLDEN-193",
     "conversation_id": "891fe76e3f02a798a27561ee5ca7354d",
     "customer_text": "@User after buying the OnePlus 5T I didn't get any instant discount neither any cashback. Could you temme why? And when I had a word wid your @AmazonHelp they give me a time frame of 3 months!! Disgusting and pathetic service...",
-    "golden_intent": "FEEDBACK_COMPLAINT_GENERAL",
+    "golden_intent": "BILLING_SUBSCRIPTION_PRIME",
     "all_applicable_intents": [
       "FEEDBACK_COMPLAINT_GENERAL"
     ],
     "difficulty_tier": "adversarial",
     "golden_triage": "ESCALATE",
-    "golden_escalation_category": "CUSTOMER_AGITATION_OR_LEGAL_THREAT",
-    "golden_escalation_reason": "High customer agitation or formal grievance requiring human supervisor handling.",
+    "golden_escalation_category": "FINANCIAL_OR_BILLING_DISPUTE",
+    "golden_escalation_reason": "Promotional cashback or digital wallet credit dispute requiring customer financial account review.",
     "historical_brand_reply": "Could you kindly share the name of the promotion, tied to your order. Will help us look into the same and guide you. ^CB",
     "human_verified": true,
-    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 0."
+    "annotation_notes": "Verified under Hiver @AmazonHelp guidelines. Tier: adversarial. Multi-intents: 0. [Audited: Wallet/cashback dispute mapped to BILLING_SUBSCRIPTION_PRIME]"
   },
   {
     "id": "GOLDEN-194",

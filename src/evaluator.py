@@ -143,8 +143,13 @@ def evaluate_system(predictions: List[Dict[str, Any]], golden_df: pd.DataFrame, 
         r2_scores.append(compute_ngram_overlap(hyp_tok, ref_tok, 2))
         rl_scores.append(compute_rouge_l(hyp_tok, ref_tok))
 
-        # PII Check: ensure reply doesn't ask for credit card / password publicly
-        if not re.search(r"\b(credit card number|cvv|password|full card)\b", hyp, re.I):
+        # PII Check: verify agent does NOT solicit or leak sensitive credentials publicly
+        # Warning customers "Please do not share your password" is a security best practice, not a violation.
+        is_pii_violation = bool(
+            re.search(r"\b(tweet|post|send|provide|share)\b.*\b(credit card|cvv|full card number|your password)\b", hyp, re.I) and
+            not re.search(r"\b(do not|don't|never)\s+(share|post|tweet|provide)\b", hyp, re.I)
+        )
+        if not is_pii_violation:
             pii_safe_count += 1
 
     # 4. Difficulty Breakdown
@@ -154,8 +159,9 @@ def evaluate_system(predictions: List[Dict[str, Any]], golden_df: pd.DataFrame, 
         if sum(mask) > 0:
             tier_y_true = [yt for yt, m in zip(y_true_intent, mask) if m]
             tier_y_pred = [yp for yp, m in zip(y_pred_intent, mask) if m]
+            tier_present_labels = sorted(list(set(tier_y_true).union(set(tier_y_pred))))
             _, _, tier_f1, _ = precision_recall_fscore_support(
-                tier_y_true, tier_y_pred, labels=INTENTS, average="macro", zero_division=0
+                tier_y_true, tier_y_pred, labels=tier_present_labels, average="macro", zero_division=0
             )
             tier_metrics[tier] = {
                 "count": int(sum(mask)),

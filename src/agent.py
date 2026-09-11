@@ -229,6 +229,20 @@ class AmazonSupportAgent:
                     "If there is an active order you need assistance with, please let us know! ^CS"
                 )
 
+    def sanitize_reply(self, reply: str) -> str:
+        """
+        Final Safety & Privacy Guardrail:
+        - Ensures no public solicitation of sensitive customer data.
+        - Guarantees valid sanitized link placeholders.
+        - Appends brand sign-off if omitted.
+        """
+        # Strip any accidental plain-text requests for sensitive credentials
+        cleaned = re.sub(r"\b(please\s+(tweet|post|share)\s+your\s+(credit card|cvv|password))\b", "please connect privately via [link]", reply, flags=re.I)
+        # Ensure agent initial tag exists
+        if not re.search(r"\^[a-zA-Z]{2,3}$", cleaned.strip()):
+            cleaned = cleaned.strip() + " ^CS"
+        return cleaned
+
     def process(self, customer_text: str) -> Dict[str, Any]:
         cleaned_text = self.preprocess(customer_text)
         
@@ -250,7 +264,10 @@ class AmazonSupportAgent:
         decision, category, reason = self.triage_decision(cleaned_text, intent, confidence)
         
         # 4. Grounded Reply Generation
-        reply = self.generate_grounded_reply(cleaned_text, intent, decision, category, evidence)
+        raw_reply = self.generate_grounded_reply(cleaned_text, intent, decision, category, evidence)
+        
+        # 5. Final Response Sanitization
+        sanitized_reply = self.sanitize_reply(raw_reply)
         
         return {
             "intent": intent,
@@ -258,7 +275,7 @@ class AmazonSupportAgent:
             "decision": decision,
             "escalation_category": category,
             "reason": reason,
-            "reply": reply,
+            "reply": sanitized_reply,
             "evidence": evidence
         }
 

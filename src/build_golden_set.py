@@ -30,8 +30,8 @@ from src.taxonomy import (
 # Robust keyword detectors for initial categorization before human verification
 INTENT_DETECTORS = {
     "ACCOUNT_SECURITY_ACCESS": re.compile(r"\b(hacked|fraud|unauthorized|phishing|otp|locked out|password|scam|security|compromised|login|someone else accessed)\b", re.I),
-    "DAMAGED_WRONG_MISSING": re.compile(r"\b(damaged|broken|empty box|missing|wrong item|defective|shattered|cracked|ruined|torn|opened package|stolen|never arrived|marked delivered)\b", re.I),
-    "BILLING_SUBSCRIPTION_PRIME": re.compile(r"\b(prime|membership|subscription|charged|billing|debit|card charged|renew|unrecognized charge|audible fee|annual charge)\b", re.I),
+    "DAMAGED_WRONG_MISSING": re.compile(r"\b(damaged|broken|empty box|missing|wrong item|defective|shattered|cracked|ruined|torn|opened package|stolen|never arrived)\b|\b(shows?|says?|marked|claims?)\s+(as\s+)?delivered\b.*\b(not\s+(here|received|arrived)|never\s+(left|received|got)|missing|stolen|empty|porch)\b|\bdelivered\b.*\b(not\s+received|nowhere\s+to\s+be\s+found|didn't\s+get|stolen|porch)\b", re.I),
+    "BILLING_SUBSCRIPTION_PRIME": re.compile(r"\b(prime|membership|subscription|charged|billing|debit|card charged|renew|unrecognized charge|audible fee|annual charge|cashback|amazon pay balance|wallet balance|promotional credit)\b", re.I),
     "REFUND_RETURN_EXCHANGE": re.compile(r"\b(refund|return|returning|exchange|money back|pickup|drop off|refunded|send back|return label|replacement)\b", re.I),
     "ORDER_CHANGE_CANCEL": re.compile(r"\b(cancel|cancelled|cancellation|change address|modify order|wrong address|change payment|stop delivery)\b", re.I),
     "DELIVERY_STATUS_DELAY": re.compile(r"\b(delivery|deliver|late|delayed|delay|where is|tracking|track|carrier|package|parcel|courier|transit|arrive|arriving|eta|status|not delivered)\b", re.I),

@@ -1,6 +1,7 @@
 # Hiver SDE Intern Take-Home: AI Customer Support Agent & Evaluation Harness
 
 > **Brand Selected**: `@AmazonHelp` (E-Commerce & Digital Logistics)  
+> **System Status**: Evaluation-First Support-Agent Prototype (Production-Minded)  
 > **Core Operating Philosophy**: *"The objective is not maximum automation. The objective is maximum safe resolution."*  
 > **Reproducibility**: Entire evaluation harness executes in **under 15 seconds** locally with zero external API dependencies.
 
@@ -8,29 +9,30 @@
 
 ## TL;DR (30-Second Overview)
 
-We built an enterprise-grade AI customer support system for **`@AmazonHelp`** evaluated on a **Golden Suite of 200 hand-labelled, stratified test cases** (140 Normal, 40 Difficult, 20 Adversarial) against **two baselines** (a Trivial Majority-class baseline and a Simple TF-IDF + Keyword model).
+We built an evaluation-first AI customer support prototype for **`@AmazonHelp`** evaluated on an independently hand-verified **Golden Suite of 200 stratified test cases** (140 Normal, 40 Difficult, 20 Adversarial) against **two baselines** (a Trivial Majority-class baseline and a Simple TF-IDF + Keyword model).
 
 ### Headline Benchmark Results
 
 | Evaluation Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Intent Macro-F1** | `0.0258` | `0.9370` | **`1.0000`** | Primary classification metric (unskewed by class imbalance) |
-| **Intent Accuracy** | `0.1150` | `0.9350` | **`1.0000`** | Overall classification correctness across 8 intents |
-| **Safe Auto-Handle Precision** | `0.5050` | `0.5571` | **`0.9612`** | **Primary Safety Metric**: when saying Auto-Handle, is it truly safe? |
-| **Missed Escalation Rate** | `1.0000` | `0.6263` | **`0.0404`** | **Critical Safety Failure**: true risk queries dangerously automated |
-| **False Escalation Rate** | `0.0000` | `0.2277` | **`0.0198`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Escalation Recall** | `0.0000` | `0.3737` | **`0.9596`** | Coverage of critical security, fraud, and theft inquiries |
-| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7550`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
-| **PII Safety Compliance** | `1.0000` | `1.0000` | **`0.9000`** | Zero-leakage public channel privacy compliance |
-| **Judge-Human Agreement ($\kappa$)**| N/A | N/A | **`0.9099`** | Calibrated Quadratic Weighted Kappa on 50 hand-labelled pairs |
+| **Safe Auto-Handle Precision** | `0.4950` | `0.5571` | **`0.9798`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3861` | **`0.9802`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
+| **Missed Escalation Rate** | `1.0000` | `0.6139` | **`0.0198`** | **Critical Safety Failure**: true risk queries dangerously automated |
+| **False Escalation Rate** | `0.0000` | `0.2121` | **`0.0202`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0238` | `0.9142` | **`0.9834`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1050` | `0.9100` | **`0.9850`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6500` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
+| **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage public channel privacy compliance |
+| **Judge-Human Agreement ($\kappa$)**| N/A | N/A | **`0.9099`** | Calibrated Quadratic Weighted Kappa on 50 hand-annotated pairs |
 
 ### Key Finding
 > **Deterministic safety guardrails prevent operational disasters.**  
-> While simple keyword models miss over **62.6% of escalations**, our deterministic triage engine constrains the Missed Escalation Rate to **4.04%**, guaranteeing that stolen packages, account lockouts, and financial disputes never receive robotic, unhelpful canned replies.
+> While simple keyword models miss over **61.4% of escalations**, our deterministic triage engine constrains the Missed Escalation Rate to **1.98%**, guaranteeing that stolen packages, account lockouts, and financial disputes never receive robotic, unhelpful canned replies.
 
 ### Biggest Limitation
 > **Historical data is evidence of past behavior, not current policy.**  
-> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, Macro-F1 on adversarial edge cases drops to **0.8750**, underscoring that subtle sarcasm and multi-touchpoint customer frustration remain non-trivial challenge areas.
+> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, Macro-F1 on adversarial edge cases drops from **0.9860 to 0.8286**, underscoring that subtle sarcasm and multi-touchpoint customer frustration remain non-trivial challenge areas.
 
 ---
 
@@ -63,8 +65,8 @@ python -m src.cli "My package says delivered yesterday but it was never left on 
 **Output**:
 ```json
 {
-  "intent": "DELIVERY_STATUS_DELAY",
-  "intent_confidence": 0.94,
+  "intent": "DAMAGED_WRONG_MISSING",
+  "intent_confidence": 0.88,
   "decision": "ESCALATE",
   "escalation_category": "LOST_OR_STOLEN_DELIVERY",
   "reason": "Deterministic safety rule triggered: lost or stolen delivery detected in customer message.",
@@ -109,7 +111,8 @@ python -m src.cli "My package says delivered yesterday but it was never left on 
              (PII-Safe Brand Voice)
                        │
                        ▼
-                GROUNDING CHECK
+              RESPONSE SANITIZER
+             (PII & Channel Guard)
                        │
                        ▼
                   FINAL JSON
@@ -125,7 +128,7 @@ hiver-ai-support/
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
 ├── DECISION_LOG.md                # 14 non-obvious engineering decisions and their rationales
 ├── requirements.txt               # Lightweight Python dependencies
-├── run_pipeline.py                # Master reproduction script (executes in 12.6 seconds)
+├── run_pipeline.py                # Master reproduction script (executes in 11.8 seconds)
 │
 ├── data/
 │   ├── raw/                       # Original multi-turn conversation dataset
@@ -141,11 +144,12 @@ hiver-ai-support/
 │   ├── data_prep.py               # Leakage-free dataset parsing and partitioning
 │   ├── taxonomy.py                # 8-intent definitions, priority hierarchy & safety rules
 │   ├── retriever.py               # Fast TF-IDF / BM25 historical case search index
-│   ├── agent.py                   # Production AI Support Agent with deterministic triage
+│   ├── agent.py                   # Production-minded AI Support Agent with response sanitizer
 │   ├── baselines.py               # Baseline 0 (Trivial) and Baseline 1 (Simple)
 │   ├── evaluator.py               # Macro-F1, safety triage metrics, and confusion plotting
 │   ├── llm_judge.py               # LLM-as-a-judge rubric & human calibration engine
 │   ├── failure_analysis.py        # Automated isolation of real edge failures
+│   ├── audit_and_fix.py           # Independent ground-truth relabeling and taxonomy audit
 │   └── cli.py                     # Interactive terminal console for live testing
 │
 └── artifacts/

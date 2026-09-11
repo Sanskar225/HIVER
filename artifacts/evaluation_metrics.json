@@ -1,7 +1,7 @@
 {
   "metadata": {
     "target_brand": "@AmazonHelp",
-    "eval_timestamp": "2026-09-11 10:15:06 UTC",
+    "eval_timestamp": "2026-09-11 10:44:39 UTC",
     "golden_sample_size": 200,
     "kb_corpus_size": 55011
   },
@@ -10,9 +10,9 @@
       "system_name": "Trivial Baseline",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.0258,
-        "intent_accuracy": 0.115,
-        "safe_auto_handle_precision": 0.505,
+        "intent_macro_f1": 0.0238,
+        "intent_accuracy": 0.105,
+        "safe_auto_handle_precision": 0.495,
         "missed_escalation_rate": 1.0,
         "false_escalation_rate": 0.0,
         "escalation_recall": 0.0,
@@ -22,8 +22,8 @@
       },
       "triage_confusion_counts": {
         "true_escalations_caught (TP)": 0,
-        "missed_escalations (FN - SAFETY HAZARD)": 99,
-        "safe_auto_handled (TN)": 101,
+        "missed_escalations (FN - SAFETY HAZARD)": 101,
+        "safe_auto_handled (TN)": 99,
         "false_escalations (FP - OVER-ESCALATION)": 0
       },
       "lexical_diagnostics": {
@@ -34,26 +34,26 @@
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 0.0285,
-          "accuracy": 0.1286
+          "macro_f1": 0.0256,
+          "accuracy": 0.1143
         },
         "difficult": {
           "count": 40,
-          "macro_f1": 0.0061,
+          "macro_f1": 0.0081,
           "accuracy": 0.025
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.0417,
+          "macro_f1": 0.0556,
           "accuracy": 0.2
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.115,
+          "precision": 0.105,
           "recall": 1.0,
-          "f1": 0.2063,
-          "support": 23
+          "f1": 0.19,
+          "support": 21
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 0.0,
@@ -65,19 +65,19 @@
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "support": 25
+          "support": 22
         },
         "ORDER_CHANGE_CANCEL": {
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "support": 18
+          "support": 19
         },
         "BILLING_SUBSCRIPTION_PRIME": {
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "support": 41
+          "support": 45
         },
         "ACCOUNT_SECURITY_ACCESS": {
           "precision": 0.0,
@@ -103,21 +103,21 @@
       "system_name": "Simple Baseline",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.937,
-        "intent_accuracy": 0.935,
+        "intent_macro_f1": 0.9142,
+        "intent_accuracy": 0.91,
         "safe_auto_handle_precision": 0.5571,
-        "missed_escalation_rate": 0.6263,
-        "false_escalation_rate": 0.2277,
-        "escalation_recall": 0.3737,
-        "escalation_precision": 0.6167,
+        "missed_escalation_rate": 0.6139,
+        "false_escalation_rate": 0.2121,
+        "escalation_recall": 0.3861,
+        "escalation_precision": 0.65,
         "pii_safety_rate": 1.0,
         "grounded_reply_pass_rate": 0.085
       },
       "triage_confusion_counts": {
-        "true_escalations_caught (TP)": 37,
+        "true_escalations_caught (TP)": 39,
         "missed_escalations (FN - SAFETY HAZARD)": 62,
         "safe_auto_handled (TN)": 78,
-        "false_escalations (FP - OVER-ESCALATION)": 23
+        "false_escalations (FP - OVER-ESCALATION)": 21
       },
       "lexical_diagnostics": {
         "rouge_1": 0.1929,
@@ -127,26 +127,26 @@
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 0.9743,
-          "accuracy": 0.9714
+          "macro_f1": 0.9454,
+          "accuracy": 0.9429
         },
         "difficult": {
           "count": 40,
-          "macro_f1": 0.623,
+          "macro_f1": 0.8306,
           "accuracy": 0.9
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.5965,
-          "accuracy": 0.75
+          "macro_f1": 0.7481,
+          "accuracy": 0.7
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.7931,
+          "precision": 0.7241,
           "recall": 1.0,
-          "f1": 0.8846,
-          "support": 23
+          "f1": 0.84,
+          "support": 21
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 1.0,
@@ -155,22 +155,22 @@
           "support": 27
         },
         "REFUND_RETURN_EXCHANGE": {
-          "precision": 1.0,
-          "recall": 0.8,
-          "f1": 0.8889,
-          "support": 25
+          "precision": 0.9,
+          "recall": 0.8182,
+          "f1": 0.8571,
+          "support": 22
         },
         "ORDER_CHANGE_CANCEL": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
-          "support": 18
+          "recall": 0.9474,
+          "f1": 0.973,
+          "support": 19
         },
         "BILLING_SUBSCRIPTION_PRIME": {
           "precision": 0.9535,
-          "recall": 1.0,
-          "f1": 0.9762,
-          "support": 41
+          "recall": 0.9111,
+          "f1": 0.9318,
+          "support": 45
         },
         "ACCOUNT_SECURITY_ACCESS": {
           "precision": 1.0,
@@ -185,9 +185,9 @@
           "support": 19
         },
         "FEEDBACK_COMPLAINT_GENERAL": {
-          "precision": 0.8387,
-          "recall": 0.963,
-          "f1": 0.8966,
+          "precision": 0.8065,
+          "recall": 0.9259,
+          "f1": 0.8621,
           "support": 27
         }
       }
@@ -196,50 +196,50 @@
       "system_name": "Proposed Agent",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 1.0,
-        "intent_accuracy": 1.0,
-        "safe_auto_handle_precision": 0.9612,
-        "missed_escalation_rate": 0.0404,
-        "false_escalation_rate": 0.0198,
-        "escalation_recall": 0.9596,
-        "escalation_precision": 0.9794,
-        "pii_safety_rate": 0.9,
-        "grounded_reply_pass_rate": 0.755
+        "intent_macro_f1": 0.9834,
+        "intent_accuracy": 0.985,
+        "safe_auto_handle_precision": 0.9798,
+        "missed_escalation_rate": 0.0198,
+        "false_escalation_rate": 0.0202,
+        "escalation_recall": 0.9802,
+        "escalation_precision": 0.9802,
+        "pii_safety_rate": 1.0,
+        "grounded_reply_pass_rate": 0.765
       },
       "triage_confusion_counts": {
-        "true_escalations_caught (TP)": 95,
-        "missed_escalations (FN - SAFETY HAZARD)": 4,
-        "safe_auto_handled (TN)": 99,
+        "true_escalations_caught (TP)": 99,
+        "missed_escalations (FN - SAFETY HAZARD)": 2,
+        "safe_auto_handled (TN)": 97,
         "false_escalations (FP - OVER-ESCALATION)": 2
       },
       "lexical_diagnostics": {
-        "rouge_1": 0.108,
+        "rouge_1": 0.1085,
         "rouge_2": 0.0114,
-        "rouge_l": 0.1031
+        "rouge_l": 0.1037
       },
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 1.0,
-          "accuracy": 1.0
+          "macro_f1": 0.986,
+          "accuracy": 0.9857
         },
         "difficult": {
           "count": 40,
-          "macro_f1": 0.75,
+          "macro_f1": 1.0,
           "accuracy": 1.0
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.875,
-          "accuracy": 1.0
+          "macro_f1": 0.8286,
+          "accuracy": 0.95
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 1.0,
+          "precision": 0.913,
           "recall": 1.0,
-          "f1": 1.0,
-          "support": 23
+          "f1": 0.9545,
+          "support": 21
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 1.0,
@@ -248,22 +248,22 @@
           "support": 27
         },
         "REFUND_RETURN_EXCHANGE": {
-          "precision": 1.0,
+          "precision": 0.9565,
           "recall": 1.0,
-          "f1": 1.0,
-          "support": 25
+          "f1": 0.9778,
+          "support": 22
         },
         "ORDER_CHANGE_CANCEL": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
-          "support": 18
+          "recall": 0.9474,
+          "f1": 0.973,
+          "support": 19
         },
         "BILLING_SUBSCRIPTION_PRIME": {
           "precision": 1.0,
           "recall": 1.0,
           "f1": 1.0,
-          "support": 41
+          "support": 45
         },
         "ACCOUNT_SECURITY_ACCESS": {
           "precision": 1.0,
@@ -279,8 +279,8 @@
         },
         "FEEDBACK_COMPLAINT_GENERAL": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
+          "recall": 0.9259,
+          "f1": 0.9615,
           "support": 27
         }
       }
