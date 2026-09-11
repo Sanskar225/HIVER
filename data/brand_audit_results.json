@@ -1,0 +1,404 @@
+[
+  {
+    "brand": "AmazonHelp",
+    "total_conversations": 81092,
+    "sample_size": 5000,
+    "resolution_cov_pct": 42.44,
+    "dm_only_pct": 0.96,
+    "vocab_entropy": 10.3,
+    "vocab_size": 9402,
+    "multi_turn_pct": 60.1,
+    "avg_turns": 4.34,
+    "avg_cust_char_len": 118.6,
+    "junk_pct": 1.0,
+    "data_quality_score": 98.5,
+    "high_risk_escalation_pct": 10.9,
+    "diff_balance_score": 51.8,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "Bonjour, mon colis est pr\u00eat depuis jeudi pour une livraison pr\u00e9vu vendredi, mais selon le suivi il n'est toujours pas partit. Que faire ?"
+        ],
+        [
+          "Support",
+          "Bonsoir, je suis d\u00e9sol\u00e9 pour cela :\\ Avez-vous re\u00e7u un e-mail concernant ce retard ou une modification de la date de livraison ? ^MH"
+        ],
+        [
+          "Customer",
+          "Non, mais la date de livraison avez \u00e9t\u00e9 repouss\u00e9 \u00e0 aujourd'hui, mais toujours aucun mouvement selon le suivi"
+        ],
+        [
+          "Support",
+          "Avez-vous contact\u00e9 notre SAV pour v\u00e9rifier ce qu'il en est? ^MD"
+        ],
+        [
+          "Customer",
+          "Non, quelle est la d\u00e9marche pour le contacter ?"
+        ],
+        [
+          "Support",
+          "Vous pouvez contacter notre SAV en cliquant sur le lien suivant : https://t.co/qzuu0dgDXz ^MD"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "did you magically read my mind or what. Even if you did, I didn't put forth such request. https://t.co/NW4HoBeCgC"
+        ],
+        [
+          "Support",
+          "Please don't provide your order details, we consider it to be personal info. Our page is visible to the public. (2/2) ^MO"
+        ],
+        [
+          "Support",
+          "Apologies for the trouble. Please contact us here: https://t.co/rS49hgaADF so that we can assist you accordingly. (1/2) ^MO"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "Buying echo dot will get me prime membership from date of purchase or from the date when my previous membership ends? @115850"
+        ],
+        [
+          "Support",
+          "Once you purchase the Echo Dot, your Prime membership will be extended for one more year after your current membership ends.^RS"
+        ],
+        [
+          "Customer",
+          "Thanks for confirming. Can you also confirm the return policy for echoes. I couldn't find it in the current documentation?"
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 100.0,
+      "resolution_cov_score": 42.4,
+      "diversity_score": 100.0,
+      "thread_richness_score": 100.0,
+      "data_quality_score": 98.5,
+      "eval_difficulty_score": 51.8,
+      "composite_score": 83.52
+    }
+  },
+  {
+    "brand": "AppleSupport",
+    "total_conversations": 76639,
+    "sample_size": 5000,
+    "resolution_cov_pct": 53.58,
+    "dm_only_pct": 30.5,
+    "vocab_entropy": 9.47,
+    "vocab_size": 6107,
+    "multi_turn_pct": 32.98,
+    "avg_turns": 2.83,
+    "avg_cust_char_len": 108.3,
+    "junk_pct": 0.6,
+    "data_quality_score": 99.1,
+    "high_risk_escalation_pct": 6.3,
+    "diff_balance_score": 42.5,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "This is wack @115858 tell me how to turn off stupid auto brightness https://t.co/P65DhVEfHr"
+        ],
+        [
+          "Support",
+          "We've got you. Follow these steps: https://t.co/bkqEVCrK2l Please DM if you have any questions. https://t.co/GDrqU22YpT"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f I\ufe0f"
+        ],
+        [
+          "Customer",
+          "Can this like get fixed already @115858"
+        ],
+        [
+          "Support",
+          "iOS 11.1.1 was recently released and it includes a fix for autocorrect issues. Be sure to back up your device prior to updating, and let us know if the issue persists afterwards. How to back up: https://t.co/4f8hwT5to6 https://t.co/GDrqU22YpT"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "I don't understand why it would she apple more than a day to fix this I glitch thing."
+        ],
+        [
+          "Customer",
+          "I'm the biggest @AppleSupport fan boy ever...but the first step to fixing is admitting you have a problem - why have that not at least acknowledged they hear us...I type this as I plan to buy the Iphone X :)"
+        ],
+        [
+          "Support",
+          "Here\u2019s what you can do to work around the issue until it\u2019s fixed in a future software update: https://t.co/xXaXeeSRt9"
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 99.5,
+      "resolution_cov_score": 53.6,
+      "diversity_score": 60.0,
+      "thread_richness_score": 60.0,
+      "data_quality_score": 99.1,
+      "eval_difficulty_score": 42.5,
+      "composite_score": 70.75
+    }
+  },
+  {
+    "brand": "Uber_Support",
+    "total_conversations": 41185,
+    "sample_size": 5000,
+    "resolution_cov_pct": 25.62,
+    "dm_only_pct": 23.54,
+    "vocab_entropy": 9.52,
+    "vocab_size": 6464,
+    "multi_turn_pct": 33.72,
+    "avg_turns": 2.92,
+    "avg_cust_char_len": 118.7,
+    "junk_pct": 0.92,
+    "data_quality_score": 98.6,
+    "high_risk_escalation_pct": 22.6,
+    "diff_balance_score": 75.2,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "Yo what\u2019s with this $300 charge? I needed an Uber and this Uber driver never even showed to pick me up? How am I getting charged for 1. A ride I never took &amp; 2. A mess I couldn\u2019t have made. Tried to make a simple correction and then y\u2019all charged me more?? https://t.co/DUtC7SKKut"
+        ],
+        [
+          "Support",
+          "We apologize for the trouble! Send us a note here, https://t.co/wW2bTlNcsR, and our team will be in touch."
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "why am I being charged $15 when my ride kept saying $2?!"
+        ],
+        [
+          "Support",
+          "Here to help! Please send us a note here; https://t.co/1xM0TILvAI so our team can assist."
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "@Uber_Support can someone help me unlock my account? I been trying for literally hours. https://t.co/Z4DHzqugB7"
+        ],
+        [
+          "Support",
+          "We've sent you a DM."
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 94.0,
+      "resolution_cov_score": 25.6,
+      "diversity_score": 62.4,
+      "thread_richness_score": 61.1,
+      "data_quality_score": 98.6,
+      "eval_difficulty_score": 75.2,
+      "composite_score": 67.65
+    }
+  },
+  {
+    "brand": "Delta",
+    "total_conversations": 25151,
+    "sample_size": 5000,
+    "resolution_cov_pct": 26.98,
+    "dm_only_pct": 13.06,
+    "vocab_entropy": 9.72,
+    "vocab_size": 7393,
+    "multi_turn_pct": 38.96,
+    "avg_turns": 3.19,
+    "avg_cust_char_len": 114.7,
+    "junk_pct": 1.12,
+    "data_quality_score": 98.3,
+    "high_risk_escalation_pct": 6.4,
+    "diff_balance_score": 42.8,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "By the way, if you\u2019re wondering this is DL4943 from ATL to GTR. A one hour flight delayed hours b/c you can\u2019t track your flight crew."
+        ],
+        [
+          "Support",
+          "Dan, please accept our apologies for the delays. Hopefully, we will have you on you way soon. *ACJ"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "Another reason I like to fly @Delta https://t.co/x3a1mj7tK2"
+        ],
+        [
+          "Support",
+          "Thanks! It is our pleasure to take care of you when you fly with us! \u2708 *TDL"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "I didn't realize my plat upgrade vouchers expired year to the day. I thought i had all 2017. Can you guys help me?"
+        ],
+        [
+          "Support",
+          "...up.  *CAC 2/2"
+        ],
+        [
+          "Support",
+          "Hi Kyle, that is correct the upgrade certificates are valid for one year. Once they are expired we have no way of opening them back... 1/2"
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 89.6,
+      "resolution_cov_score": 27.0,
+      "diversity_score": 72.0,
+      "thread_richness_score": 68.8,
+      "data_quality_score": 98.3,
+      "eval_difficulty_score": 42.8,
+      "composite_score": 66.65
+    }
+  },
+  {
+    "brand": "SpotifyCares",
+    "total_conversations": 27910,
+    "sample_size": 5000,
+    "resolution_cov_pct": 29.26,
+    "dm_only_pct": 30.64,
+    "vocab_entropy": 9.53,
+    "vocab_size": 6467,
+    "multi_turn_pct": 36.6,
+    "avg_turns": 3.16,
+    "avg_cust_char_len": 104.2,
+    "junk_pct": 1.18,
+    "data_quality_score": 98.2,
+    "high_risk_escalation_pct": 7.4,
+    "diff_balance_score": 44.8,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "I have an unknown mobile device connecting to my premium account. I've tried disconnect all devices, pw change. What now?"
+        ],
+        [
+          "Support",
+          "Hey Zachary! Head to https://t.co/cnaaFIwigZ and click Sign Out Everywhere. You may want to change your password again, just to be safe /TF"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "@90637 just charged me and didn't make my account premium #ThankYouSpotify :)"
+        ],
+        [
+          "Support",
+          "Hi Lyanna. Don't worry, we'll look into this. Can you DM us your username or email address so we can check? /JU https://t.co/ldFdZRiNAt"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "Hey @115888, why is your app using significant amounts of background data (~10 MB/day) even when I'm not allowing it to use background data at all, and I'm not streaming on my phone?"
+        ],
+        [
+          "Customer",
+          "I'm wondering if this is something to do with how my app follows along when I'm listening on another device, but if so, how do I stop that from happening?"
+        ],
+        [
+          "Customer",
+          "@115888 why https://t.co/P1hdOzaYPG"
+        ],
+        [
+          "Support",
+          "Hey Edward! Does logging out of your account, restarting your device, and logging back in help at all? Let us know how it goes /TF"
+        ],
+        [
+          "Customer",
+          "Hi there, thanks for the suggestions. I did those steps, but a few days later the background data usage is up to 37.05 MB. What can I do to stop this from increasing? Thanks."
+        ],
+        [
+          "Support",
+          "Thanks for giving them a try. Can you DM us your account's email address? We'll check things backstage /CP https://t.co/ldFdZRiNAt"
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 90.6,
+      "resolution_cov_score": 29.3,
+      "diversity_score": 62.9,
+      "thread_richness_score": 65.3,
+      "data_quality_score": 98.2,
+      "eval_difficulty_score": 44.8,
+      "composite_score": 65.17
+    }
+  },
+  {
+    "brand": "TMobileHelp",
+    "total_conversations": 22322,
+    "sample_size": 5000,
+    "resolution_cov_pct": 27.06,
+    "dm_only_pct": 63.2,
+    "vocab_entropy": 9.64,
+    "vocab_size": 6300,
+    "multi_turn_pct": 34.66,
+    "avg_turns": 3.19,
+    "avg_cust_char_len": 111.0,
+    "junk_pct": 1.68,
+    "data_quality_score": 97.5,
+    "high_risk_escalation_pct": 7.3,
+    "diff_balance_score": 44.6,
+    "representative_conversations": [
+      [
+        [
+          "Customer",
+          "Be careful everyone @115911 is bait and switching people to get on there service. #baitandswitch #shittycompany they just can't compete with @115725"
+        ],
+        [
+          "Support",
+          "For more information regarding our conversation, please reply back in a DM! :) *TiannahReagor"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "Hey @115911 @115913 I've been searching your website but am having trouble; is there a way to block voicemails from anonymous numbers? I get about 10 calls a day from an anonymous number and it doesn't ring but they always leave a silent voicemail; talk about irritating \ud83d\ude20\ud83d\ude21"
+        ],
+        [
+          "Support",
+          "@115913 That sounds frustrating. Click https://t.co/Mww69Rzn7a to send me a message so we can chat. *AshleyNelson"
+        ]
+      ],
+      [
+        [
+          "Customer",
+          "There\u2019s 0 excuse for your site being unable to scale to support any amount of traffic that hits it. Embarrassed for you."
+        ],
+        [
+          "Customer",
+          "I\u2019m sorry this hasn't been an easy process, Brendten! Our website may be super busy, but I promise it\u2019s worth it. Tried the app? *WhitneyJ"
+        ],
+        [
+          "Customer",
+          "I love you guys. Long time customer. Just want to get a new phone. App won\u2019t work on plane :("
+        ],
+        [
+          "Support",
+          "Oh no. We've got you, Brendten! DM us. *GiselleM"
+        ]
+      ]
+    ],
+    "scores": {
+      "usable_conv_score": 88.6,
+      "resolution_cov_score": 27.1,
+      "diversity_score": 68.2,
+      "thread_richness_score": 62.5,
+      "data_quality_score": 97.5,
+      "eval_difficulty_score": 44.6,
+      "composite_score": 64.78
+    }
+  }
+]

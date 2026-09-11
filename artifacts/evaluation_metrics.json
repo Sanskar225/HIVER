@@ -1,0 +1,318 @@
+{
+  "metadata": {
+    "target_brand": "@AmazonHelp",
+    "eval_timestamp": "2026-09-11 10:15:06 UTC",
+    "golden_sample_size": 200,
+    "kb_corpus_size": 55011
+  },
+  "systems": {
+    "trivial_baseline": {
+      "system_name": "Trivial Baseline",
+      "sample_size": 200,
+      "headline_metrics": {
+        "intent_macro_f1": 0.0258,
+        "intent_accuracy": 0.115,
+        "safe_auto_handle_precision": 0.505,
+        "missed_escalation_rate": 1.0,
+        "false_escalation_rate": 0.0,
+        "escalation_recall": 0.0,
+        "escalation_precision": 0.0,
+        "pii_safety_rate": 1.0,
+        "grounded_reply_pass_rate": 0.0
+      },
+      "triage_confusion_counts": {
+        "true_escalations_caught (TP)": 0,
+        "missed_escalations (FN - SAFETY HAZARD)": 99,
+        "safe_auto_handled (TN)": 101,
+        "false_escalations (FP - OVER-ESCALATION)": 0
+      },
+      "lexical_diagnostics": {
+        "rouge_1": 0.1287,
+        "rouge_2": 0.0132,
+        "rouge_l": 0.1053
+      },
+      "difficulty_tier_breakdown": {
+        "normal": {
+          "count": 140,
+          "macro_f1": 0.0285,
+          "accuracy": 0.1286
+        },
+        "difficult": {
+          "count": 40,
+          "macro_f1": 0.0061,
+          "accuracy": 0.025
+        },
+        "adversarial": {
+          "count": 20,
+          "macro_f1": 0.0417,
+          "accuracy": 0.2
+        }
+      },
+      "per_class_intent_metrics": {
+        "DELIVERY_STATUS_DELAY": {
+          "precision": 0.115,
+          "recall": 1.0,
+          "f1": 0.2063,
+          "support": 23
+        },
+        "DAMAGED_WRONG_MISSING": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 27
+        },
+        "REFUND_RETURN_EXCHANGE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 25
+        },
+        "ORDER_CHANGE_CANCEL": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 18
+        },
+        "BILLING_SUBSCRIPTION_PRIME": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 41
+        },
+        "ACCOUNT_SECURITY_ACCESS": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 20
+        },
+        "TECHNICAL_PRODUCT_SUPPORT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 19
+        },
+        "FEEDBACK_COMPLAINT_GENERAL": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 27
+        }
+      }
+    },
+    "simple_baseline": {
+      "system_name": "Simple Baseline",
+      "sample_size": 200,
+      "headline_metrics": {
+        "intent_macro_f1": 0.937,
+        "intent_accuracy": 0.935,
+        "safe_auto_handle_precision": 0.5571,
+        "missed_escalation_rate": 0.6263,
+        "false_escalation_rate": 0.2277,
+        "escalation_recall": 0.3737,
+        "escalation_precision": 0.6167,
+        "pii_safety_rate": 1.0,
+        "grounded_reply_pass_rate": 0.085
+      },
+      "triage_confusion_counts": {
+        "true_escalations_caught (TP)": 37,
+        "missed_escalations (FN - SAFETY HAZARD)": 62,
+        "safe_auto_handled (TN)": 78,
+        "false_escalations (FP - OVER-ESCALATION)": 23
+      },
+      "lexical_diagnostics": {
+        "rouge_1": 0.1929,
+        "rouge_2": 0.0509,
+        "rouge_l": 0.1514
+      },
+      "difficulty_tier_breakdown": {
+        "normal": {
+          "count": 140,
+          "macro_f1": 0.9743,
+          "accuracy": 0.9714
+        },
+        "difficult": {
+          "count": 40,
+          "macro_f1": 0.623,
+          "accuracy": 0.9
+        },
+        "adversarial": {
+          "count": 20,
+          "macro_f1": 0.5965,
+          "accuracy": 0.75
+        }
+      },
+      "per_class_intent_metrics": {
+        "DELIVERY_STATUS_DELAY": {
+          "precision": 0.7931,
+          "recall": 1.0,
+          "f1": 0.8846,
+          "support": 23
+        },
+        "DAMAGED_WRONG_MISSING": {
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 27
+        },
+        "REFUND_RETURN_EXCHANGE": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8889,
+          "support": 25
+        },
+        "ORDER_CHANGE_CANCEL": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 18
+        },
+        "BILLING_SUBSCRIPTION_PRIME": {
+          "precision": 0.9535,
+          "recall": 1.0,
+          "f1": 0.9762,
+          "support": 41
+        },
+        "ACCOUNT_SECURITY_ACCESS": {
+          "precision": 1.0,
+          "recall": 0.95,
+          "f1": 0.9744,
+          "support": 20
+        },
+        "TECHNICAL_PRODUCT_SUPPORT": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 19
+        },
+        "FEEDBACK_COMPLAINT_GENERAL": {
+          "precision": 0.8387,
+          "recall": 0.963,
+          "f1": 0.8966,
+          "support": 27
+        }
+      }
+    },
+    "proposed_agent": {
+      "system_name": "Proposed Agent",
+      "sample_size": 200,
+      "headline_metrics": {
+        "intent_macro_f1": 1.0,
+        "intent_accuracy": 1.0,
+        "safe_auto_handle_precision": 0.9612,
+        "missed_escalation_rate": 0.0404,
+        "false_escalation_rate": 0.0198,
+        "escalation_recall": 0.9596,
+        "escalation_precision": 0.9794,
+        "pii_safety_rate": 0.9,
+        "grounded_reply_pass_rate": 0.755
+      },
+      "triage_confusion_counts": {
+        "true_escalations_caught (TP)": 95,
+        "missed_escalations (FN - SAFETY HAZARD)": 4,
+        "safe_auto_handled (TN)": 99,
+        "false_escalations (FP - OVER-ESCALATION)": 2
+      },
+      "lexical_diagnostics": {
+        "rouge_1": 0.108,
+        "rouge_2": 0.0114,
+        "rouge_l": 0.1031
+      },
+      "difficulty_tier_breakdown": {
+        "normal": {
+          "count": 140,
+          "macro_f1": 1.0,
+          "accuracy": 1.0
+        },
+        "difficult": {
+          "count": 40,
+          "macro_f1": 0.75,
+          "accuracy": 1.0
+        },
+        "adversarial": {
+          "count": 20,
+          "macro_f1": 0.875,
+          "accuracy": 1.0
+        }
+      },
+      "per_class_intent_metrics": {
+        "DELIVERY_STATUS_DELAY": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 23
+        },
+        "DAMAGED_WRONG_MISSING": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 27
+        },
+        "REFUND_RETURN_EXCHANGE": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 25
+        },
+        "ORDER_CHANGE_CANCEL": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 18
+        },
+        "BILLING_SUBSCRIPTION_PRIME": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 41
+        },
+        "ACCOUNT_SECURITY_ACCESS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 20
+        },
+        "TECHNICAL_PRODUCT_SUPPORT": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 19
+        },
+        "FEEDBACK_COMPLAINT_GENERAL": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 27
+        }
+      }
+    }
+  },
+  "judge_human_calibration": {
+    "calibration_sample_size": 50,
+    "exact_agreement_pct": 96.0,
+    "within_one_point_agreement_pct": 100.0,
+    "cohens_quadratic_weighted_kappa": 0.9099,
+    "spearman_rank_correlation": 0.9491,
+    "spearman_p_value": 9.85122487776733e-26,
+    "disagreement_count": 2,
+    "notable_disagreements": [
+      {
+        "example_id": "GOLDEN-070",
+        "customer_text": "so if u don't have prime, u won't ship? Nice company. Still waiting on a order placed a week ago to just ship",
+        "agent_reply": "I understand your concern regarding unexpected charges on your statement. Because this involves private billing and card details, please send us a DM or contact us via our secure page: [link] so an account specialist can safely review the transactions for you. ^CS",
+        "human_rating": 4,
+        "judge_rating": 5,
+        "difference": 1,
+        "disagreement_rationale": "Judge awarded 5/5 for providing self-service [link]. Human QA marked down to 3/5 or 4/5 because the customer explicitly stated previous self-service attempts had failed."
+      },
+      {
+        "example_id": "GOLDEN-183",
+        "customer_text": "Standard copy paste answers without even thinking about what the issue is and why customer is so pissed off. Amazingly pathetic customer service.",
+        "agent_reply": "Thank you for sharing your feedback with us. We appreciate hearing from our customers as it helps us improve our service. If there is an active order you need assistance with, please let us know! ^CS",
+        "human_rating": 3,
+        "judge_rating": 4,
+        "difference": 1,
+        "disagreement_rationale": "Judge rated 5/5 due to complete keyword coverage and DM link. Human QA penalized response (4/5) because a canned empathy opener ('not the standard we aim to deliver') feels robotic to an enraged customer."
+      }
+    ]
+  }
+}

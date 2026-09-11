@@ -1,0 +1,149 @@
+{
+  "cluster_distribution": {
+    "SUBSCRIPTION_BILLING_PRIME": 62,
+    "ACCOUNT_SECURITY_ACCESS": 27,
+    "REFUND_RETURN_EXCHANGE": 72,
+    "DELIVERY_STATUS_DELAY": 200,
+    "TECHNICAL_PRODUCT_SUPPORT": 105,
+    "ORDER_CHANGE_CANCEL": 26,
+    "DAMAGED_WRONG_MISSING": 31
+  },
+  "multi_intent_count": 97,
+  "unmatched_count": 477,
+  "sample_per_intent": {
+    "SUBSCRIPTION_BILLING_PRIME": [
+      "The sound quality of The Deer Hunter on Amazon Prime on the Xbox is the worst thing I've ever heard. @AmazonHelp @XboxSupport",
+      "@115821 Have issues with subtitles being out of sync for Prime videos. Specifically Dr Who. Any fix? Is this an issue on my end?",
+      "You asked (a lot). We listened. Amazon Prime Video is coming to the TV App and all Apple TVs this year.",
+      "Get Ready for Prime Day! Get 25% off Summer essentials on Prime Now. Prices as marked. While supplies last. https://t.co/5iwSWpRkVJ https://t.co/4FuDIcvXnz",
+      "It’s Prime Day! Shop top deals including up to 35% off Amazon devices. Prices as marked. While supplies last. https://t.co/MFn0Lg2KvM https://t.co/onljuJnVCP"
+    ],
+    "ACCOUNT_SECURITY_ACCESS": [
+      "My grandfather received a call from 206-508-4014 claiming to be from Amazon.  Is this actually from Amazon or a scam?",
+      "100s of ppl have been scammed from my Seller Acct that was hacked..called 2x about it 3wks ago. When will you actually do something?",
+      "I understand security but this must be shamed publicly for misdoings &amp; U not owing up.The bots auto replies NOT helping either!! https://t.co/Kt5YEFbCP1",
+      "how does Amazon stop fraud by buyer and support seller...been calling daily for 22 days...and just more reports and more depts.",
+      "I've changed my password, and I'm having trouble logging in. Can someone help, please?"
+    ],
+    "REFUND_RETURN_EXCHANGE": [
+      "Hy friends don't buy any products form Amazon India because I have one product returned at 6-02-16 but still we not get any refund",
+      "Guided by your cust support to place a parallel order @115850 not getting refund for Amazon Pay balance now. Order 403-2360667-1789914",
+      "@3974 IN hello jeffBezos  can you help me with the patethic service of amzon india .wrong products sent and return pick not done https://t.co/PzEz6qdkvd",
+      "why i can't get refund of my headphone which is worth 8999. they are is no return only replace. Now i can't do anything.",
+      "STILL NOT RECEIVED MY BOOK. I WOULD LIKE A REFUND PLEASE. ORDER PENDING SINCE JUNE 19th, 2017 https://t.co/pagtQwyUf8"
+    ],
+    "DELIVERY_STATUS_DELAY": [
+      "Hii i bought a psn card like 1 hour ago but the status still in pending verification whats the problem?",
+      "@115850 Ordered iPhone with 1 day delivery..Phn not rcvd ..got fake messages that due to unavailability,not delivered????",
+      "@AmazonHelp @115821  placed order under prime fr delivery 11am Apr 28 #404-8214654-9940334 delivery not come web shows on the way",
+      "your garbage service can't even deliver a package when I got one day shipping, now I have to wait until Monday for it to be shipped",
+      "Worst delivery by @115850 . Not received the product till yet although it was one day delivery."
+    ],
+    "TECHNICAL_PRODUCT_SUPPORT": [
+      "@AmazonHelp, why is the convenient chat support not available in the Amazon Android app? :-/",
+      "Participate in the Fitbit quiz on the Amazon app today and two lucky winners win a Fitbit Charge 2 and a Fitbit Flex 2! #AppFitnessFest https://t.co/4SLDRsbetb",
+      "Monetizing on Google Home and Amazon Alexa — The Fine Print. https://t.co/0bZjJ3dLLa https://t.co/RGQtuL5Y1F",
+      "Anyone know does Amazon Alexa work in Ireland? I can't download the app, says not available in your country.",
+      "Hi @AmazonHelp, Amazon Video won't play on Panasonic Smart TV - just flicks back to main channels. Please can you help? @129773"
+    ],
+    "ORDER_CHANGE_CANCEL": [
+      "How is it @115821 can't manage their own invintory and cancel a wharegouse deal 2 days later #fail  #nothappy off to @Walmart I guess.",
+      "need help 2 cancel Sling tv from my fire stick, moving and need to stop sling for few months pls help",
+      "Trying to place the order from my account but order gets automaticaly cancelled.Why??",
+      "Cancelled my Prime membership roughly 3 months ago, just noticed i've been charged for prime for the past 2 months. Any help.",
+      "Why my particular order is getting cancelled and receiving reply which cannot be digested. 6 times the same order cancelled."
+    ],
+    "DAMAGED_WRONG_MISSING": [
+      "im a retailer on amazon and my entire inventory that i recalled is missing. No proper follow-up. Higher authority i could contact?",
+      "@AmazonHelp @115850 @14862 @218245 @131027 @14863 @1560 Amazon selling damaged product with Coolpad https://t.co/oe9Q4p3bf3",
+      "why there is Tamil, Telugu category in Amazon prime video, but Kannada missing ???",
+      "Amazon truck damaged my lawn my lawn .Love Amazon . So sad no one called me back today as promised! Why?",
+      "How much time does @AmazonHelp need to share a product invoice? Firstly, your seller sells me a defective Jaybird.  (1/2) @115821 @115850"
+    ]
+  },
+  "multi_intent_samples": [
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "@AmazonHelp @115821  placed order under prime fr delivery 11am Apr 28 #404-8214654-9940334 delivery not come web shows on the way"
+    },
+    {
+      "intents": [
+        "SUBSCRIPTION_BILLING_PRIME",
+        "TECHNICAL_PRODUCT_SUPPORT"
+      ],
+      "text": "You asked (a lot). We listened. Amazon Prime Video is coming to the TV App and all Apple TVs this year."
+    },
+    {
+      "intents": [
+        "ORDER_CHANGE_CANCEL",
+        "TECHNICAL_PRODUCT_SUPPORT"
+      ],
+      "text": "need help 2 cancel Sling tv from my fire stick, moving and need to stop sling for few months pls help"
+    },
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "Hey Singapore! Prime Now has landed. Get 2-hour delivery on tens of thousands of products. Learn more at https://t.co/Y0B1433goU #primenowSG https://t.co/F3PpHY6KFu"
+    },
+    {
+      "intents": [
+        "SUBSCRIPTION_BILLING_PRIME",
+        "TECHNICAL_PRODUCT_SUPPORT"
+      ],
+      "text": "What is the default location of downloaded video in Amazon Prime videos app on android phone? #PrimeVideos #amazon"
+    },
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "why is this my second prime purchase in a row that I'm getting later than my two day guaranteed delivery?"
+    },
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "ORDER_CHANGE_CANCEL",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "I don't use my @115821 Prime account anymore, since @115817 always messes up my delivery and I never get my stuff. Probably time to cancel."
+    },
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "When did #AmazonPrime stop weekend delivery? Everything says #Prime delivery for Monday. @115821 please reinstate #weekendDelivery."
+    },
+    {
+      "intents": [
+        "DAMAGED_WRONG_MISSING",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "why there is Tamil, Telugu category in Amazon prime video, but Kannada missing ???"
+    },
+    {
+      "intents": [
+        "DELIVERY_STATUS_DELAY",
+        "SUBSCRIPTION_BILLING_PRIME"
+      ],
+      "text": "Yo @115821, why am I paying for prime when you can’t seem to get anything here on time? Last package was a month late."
+    }
+  ],
+  "unmatched_samples": [
+    "what in the world is a balance withheld?  #customerservice doesnt seem to know!",
+    "a friend of mine bought my book and wrote a review but it doesn't say VERIFIED PURCHASE. Will you please help me fix this? Thanks!",
+    "i bookd a fostelo women's handbag on 4july bt still it is not delvrd ",
+    "1/ @115850 Are you guys leaking email ids of user who applied for Amazon BTS offer?My bro got this spam email: http://t.co/6YtfYm0aLN",
+    "It's officially Fall! So, we're just goofing off a bit, waiting for #Halloween http://t.co/aWnCgZakZy",
+    "No i have not recived any email like what you are talking",
+    "See what upcoming launch Amit Agrawal,country head of Amazon India,is excited about https://t.co/Ujb0A0uWVu https://t.co/dhwNtCkNVi",
+    "Save $30 on the Fire HD 6 #Amazon https://t.co/giPiZfmEHl https://t.co/tgFIui6Xdp",
+    "Quite disappointed in the shipment I received today. Makes me re-think about ordering discreet items! https://t.co/2EyMA7bkau",
+    "Very unhappy with @115830 @AmazonHelp item I ordered sold by Amazon dropped 15~ % 1/2 days after ordering and won't honour price drop"
+  ]
+}

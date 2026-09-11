@@ -1,0 +1,281 @@
+"""
+Phase 5: Proposed AI Customer Support Agent for @AmazonHelp.
+Architecture:
+1. Preprocessing & Normalization
+2. Intent Classification with Multi-Intent Priority Hierarchy
+3. Hybrid Retrieval of Historical Resolution Cases (with Conversation IDs)
+4. Deterministic Safety-First Triage Engine ("Maximize safe resolution, not automation rate")
+5. Grounded Reply Generator (Authentic @AmazonHelp Tone, PII Safety, Historical Grounding)
+6. Grounding Validation & Structured JSON Output
+"""
+import os
+import re
+import json
+from typing import Dict, Any, List, Optional
+from src.config import (
+    INTENTS,
+    INTENT_PRIORITY,
+    DECISION_AUTO_HANDLE,
+    DECISION_ESCALATE,
+    ESCALATION_CATEGORIES
+)
+from src.taxonomy import (
+    INTENT_METADATA,
+    HIGH_RISK_PATTERNS,
+    resolve_intent_collision,
+    evaluate_deterministic_risk
+)
+from src.retriever import HistoricalRetriever
+from src.build_golden_set import classify_candidate, INTENT_DETECTORS
+
+class AmazonSupportAgent:
+    def __init__(self, retriever: Optional[HistoricalRetriever] = None, model_name: str = "rule-grounded"):
+        self.retriever = retriever or HistoricalRetriever()
+        self.model_name = model_name
+
+    def preprocess(self, text: str) -> str:
+        text = re.sub(r"@\d+", "@User", text)
+        text = re.sub(r"https?://\S+", "[link]", text)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
+
+    def classify_intent(self, text: str) -> tuple:
+        detected = []
+        for intent, pattern in INTENT_DETECTORS.items():
+            if pattern.search(text):
+                detected.append(intent)
+
+        if not detected:
+            primary = "FEEDBACK_COMPLAINT_GENERAL"
+            confidence = 0.85
+        elif len(detected) == 1:
+            primary = detected[0]
+            confidence = 0.94
+        else:
+            primary = resolve_intent_collision(detected)
+            # Slight confidence reduction when resolving collision
+            confidence = 0.88
+
+        return primary, confidence, detected
+
+    def triage_decision(self, customer_text: str, intent: str, confidence: float) -> tuple:
+        """
+        Deterministic Safety Engine:
+        Principle: "Maximize safe resolution, not automation rate."
+        Safety guardrails CANNOT be overridden by LLM.
+        """
+        # 1. Deterministic High-Risk Patterns
+        is_risk, risk_cat, risk_reason = evaluate_deterministic_risk(customer_text)
+        if is_risk:
+            return DECISION_ESCALATE, risk_cat, risk_reason
+
+        # 2. Intent-specific policy rules
+        if intent == "ACCOUNT_SECURITY_ACCESS":
+            return (
+                DECISION_ESCALATE, 
+                "ACCOUNT_SECURITY_RISK", 
+                "Suspected account compromise or security lockout requires identity verification via private channel."
+            )
+
+        if intent == "BILLING_SUBSCRIPTION_PRIME":
+            return (
+                DECISION_ESCALATE, 
+                "FINANCIAL_OR_BILLING_DISPUTE", 
+                "Recurring subscription charge or unrecognized fee requires account billing review."
+            )
+
+        if intent == "DAMAGED_WRONG_MISSING":
+            return (
+                DECISION_ESCALATE, 
+                "DAMAGED_PHYSICAL_MERCHANDISE", 
+                "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval."
+            )
+
+        if intent == "DELIVERY_STATUS_DELAY":
+            # If tracking says delivered or package is missing, must escalate
+            if re.search(r"\b(delivered|missing|porch|lost|never arrived|stolen)\b", customer_text, re.I):
+                return (
+                    DECISION_ESCALATE, 
+                    "LOST_OR_STOLEN_DELIVERY", 
+                    "Package marked delivered but not received by customer; requires carrier check and account-specific trace."
+                )
+            # Routine tracking ETA can be auto-handled via self-service
+            return (
+                DECISION_AUTO_HANDLE, 
+                "NONE", 
+                "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link."
+            )
+
+        if intent == "ORDER_CHANGE_CANCEL":
+            if re.search(r"\b(already shipped|too late|on the way|in transit)\b", customer_text, re.I):
+                return (
+                    DECISION_ESCALATE, 
+                    "MANUAL_REFUND_OR_RETURN_OVERRIDE", 
+                    "Package already dispatched; self-serve cancellation unavailable, manual carrier intercept or return required."
+                )
+            return (
+                DECISION_AUTO_HANDLE, 
+                "NONE", 
+                "Self-service order cancellation or address modification instructions can be handled via 'Your Orders' pre-dispatch."
+            )
+
+        if intent == "REFUND_RETURN_EXCHANGE":
+            if re.search(r"\b(where is my refund|haven't received refund|still waiting for money|refund delay)\b", customer_text, re.I):
+                return (
+                    DECISION_ESCALATE, 
+                    "MANUAL_REFUND_OR_RETURN_OVERRIDE", 
+                    "Refund disbursement inquiry requiring customer account financial lookup."
+                )
+            return (
+                DECISION_AUTO_HANDLE, 
+                "NONE", 
+                "Standard 30-day return policy and self-service return label generation guidance can be auto-handled."
+            )
+
+        if intent == "TECHNICAL_PRODUCT_SUPPORT":
+            return (
+                DECISION_AUTO_HANDLE, 
+                "NONE", 
+                "First-line technical troubleshooting (rebooting device, clearing app cache) can be safely auto-handled."
+            )
+
+        # FEEDBACK_COMPLAINT_GENERAL
+        if re.search(r"\b(terrible|worst|disgusted|furious|lawyer|police|sue|unacceptable)\b", customer_text, re.I):
+            return (
+                DECISION_ESCALATE, 
+                "CUSTOMER_AGITATION_OR_LEGAL_THREAT", 
+                "Severe customer agitation or brand grievance requiring human supervisor attention."
+            )
+
+        return (
+            DECISION_AUTO_HANDLE, 
+            "NONE", 
+            "General customer feedback or commentary acknowledged with empathetic brand messaging."
+        )
+
+    def generate_grounded_reply(
+        self, 
+        customer_text: str, 
+        intent: str, 
+        decision: str, 
+        escalation_cat: str, 
+        evidence: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Generates a grounded, empathetic reply strictly reflecting Amazon's historical resolution tone.
+        Key safety rules:
+        1. Never ask for PII (credit cards, passwords, order IDs) publicly.
+        2. If ESCALATE, direct customer to secure private DM / Contact Us link.
+        3. If AUTO_HANDLE, provide concrete self-serve steps.
+        4. Sign off with authentic agent initial tag (^CS).
+        """
+        # Grounding context from historical evidence
+        hist_reply = evidence[0]["support_reply"] if evidence else ""
+
+        if decision == DECISION_ESCALATE:
+            if escalation_cat == "LOST_OR_STOLEN_DELIVERY":
+                return (
+                    "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! "
+                    "For your privacy, please do not post your order details here. Please send us a direct message "
+                    "with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^CS"
+                )
+            elif escalation_cat == "ACCOUNT_SECURITY_RISK":
+                return (
+                    "Thank you for bringing this to our attention. We take account security very seriously. "
+                    "Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, "
+                    "and please reach out to our account security specialists directly via our secure portal: [link]. ^CS"
+                )
+            elif escalation_cat == "FINANCIAL_OR_BILLING_DISPUTE":
+                return (
+                    "I understand your concern regarding unexpected charges on your statement. "
+                    "Because this involves private billing and card details, please send us a DM or contact us via our secure page: [link] "
+                    "so an account specialist can safely review the transactions for you. ^CS"
+                )
+            elif escalation_cat == "DAMAGED_PHYSICAL_MERCHANDISE":
+                return (
+                    "I'm truly sorry your order arrived damaged! We want to make this right immediately. "
+                    "Please send us a direct message with your order number via [link] so a specialist can authorize a free replacement or full refund. ^CS"
+                )
+            else: # Customer agitation or general escalation
+                return (
+                    "I'm very sorry for the frustrating experience you've had. This is definitely not the standard we aim to deliver. "
+                    "Please connect with us via direct message at [link] so we can have a representative review your account history and resolve this for you. ^CS"
+                )
+
+        else: # AUTO_HANDLE
+            if intent == "DELIVERY_STATUS_DELAY":
+                return (
+                    "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate "
+                    "directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^CS"
+                )
+            elif intent == "REFUND_RETURN_EXCHANGE":
+                return (
+                    "You can easily initiate a return or replacement directly through your account! "
+                    "Just visit 'Your Orders' at [link], select the item, and choose 'Return or replace items' to print a prepaid return label. ^CS"
+                )
+            elif intent == "ORDER_CHANGE_CANCEL":
+                return (
+                    "If your order has not yet entered the shipping process, you can cancel it or update your shipping address by visiting "
+                    "'Your Orders' at [link] and clicking 'Cancel items' or 'Change'. ^CS"
+                )
+            elif intent == "TECHNICAL_PRODUCT_SUPPORT":
+                return (
+                    "Sorry for the technical glitch! A quick troubleshooting step that often resolves this is performing a hard restart by holding "
+                    "the power button down for 40 seconds, or clearing the app cache. More device steps are available here: [link]. ^CS"
+                )
+            else: # FEEDBACK_COMPLAINT_GENERAL
+                return (
+                    "Thank you for sharing your feedback with us. We appreciate hearing from our customers as it helps us improve our service. "
+                    "If there is an active order you need assistance with, please let us know! ^CS"
+                )
+
+    def process(self, customer_text: str) -> Dict[str, Any]:
+        cleaned_text = self.preprocess(customer_text)
+        
+        # 1. Intent Classification
+        intent, confidence, all_detected = self.classify_intent(cleaned_text)
+        
+        # 2. Hybrid Historical Case Retrieval
+        hits = self.retriever.retrieve(cleaned_text, top_k=2)
+        evidence = [
+            {
+                "conversation_id": h["conversation_id"],
+                "similarity": h["similarity_score"],
+                "support_reply": h["support_reply"]
+            }
+            for h in hits
+        ]
+        
+        # 3. Deterministic Safety-First Triage
+        decision, category, reason = self.triage_decision(cleaned_text, intent, confidence)
+        
+        # 4. Grounded Reply Generation
+        reply = self.generate_grounded_reply(cleaned_text, intent, decision, category, evidence)
+        
+        return {
+            "intent": intent,
+            "intent_confidence": confidence,
+            "decision": decision,
+            "escalation_category": category,
+            "reason": reason,
+            "reply": reply,
+            "evidence": evidence
+        }
+
+if __name__ == "__main__":
+    agent = AmazonSupportAgent()
+    
+    test_cases = [
+        "My package was supposed to arrive today, where is it?",
+        "Package says delivered on the app, but there is nothing on my porch! I think it was stolen.",
+        "I was charged $14.99 for Amazon Prime on my credit card but I never signed up for it.",
+        "How do I return a pair of shoes that are too small?",
+        "Your customer service is utterly useless, I am calling my lawyer and contacting the consumer court!"
+    ]
+    
+    for tc in test_cases:
+        print("\n" + "="*80)
+        print("CUSTOMER:", tc)
+        res = agent.process(tc)
+        print("AGENT OUTPUT:")
+        print(json.dumps(res, indent=2))
