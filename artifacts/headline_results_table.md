@@ -18,7 +18,7 @@
 | **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Cleanliness of human triage queue |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | Zero-leakage compliance (protecting customer identity) |
-| **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1037`** | Lexical alignment with historical Amazon resolutions |
+| **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1033`** | Lexical alignment with historical Amazon resolutions |
 
 ---
 

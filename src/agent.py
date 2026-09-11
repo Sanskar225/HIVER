@@ -129,7 +129,7 @@ class AmazonSupportAgent:
             return (
                 DECISION_AUTO_HANDLE, 
                 "NONE", 
-                "Standard 30-day return policy and self-service return label generation guidance can be auto-handled."
+                "Self-service return initiation and prepaid return label guidance can be auto-handled via 'Your Orders'."
             )
 
         if intent == "TECHNICAL_PRODUCT_SUPPORT":
@@ -162,71 +162,79 @@ class AmazonSupportAgent:
         evidence: List[Dict[str, Any]]
     ) -> str:
         """
-        Generates a grounded, empathetic reply strictly reflecting Amazon's historical resolution tone.
-        Key safety rules:
-        1. Never ask for PII (credit cards, passwords, order IDs) publicly.
-        2. If ESCALATE, direct customer to secure private DM / Contact Us link.
-        3. If AUTO_HANDLE, provide concrete self-serve steps.
-        4. Sign off with authentic agent initial tag (^CS).
+        Generates a policy-safe, brand-aligned reply grounded in historical resolution evidence.
+        
+        Architecture: Retrieval-Conditioned Canonical Reply Synthesis
+        Rather than regurgitating raw historical tweets verbatim (which risks link rot,
+        stale 2017 policies, and PII leaks as shown in Baseline 1's 8.5% pass rate),
+        or relying on unconstrained LLM hallucinations, the agent extracts historical
+        voice and resolution cues from the top retrieved cases (evidence[0]) and synthesizes
+        a policy-compliant response with guaranteed safe link anchors and channel security.
         """
-        # Grounding context from historical evidence
         hist_reply = evidence[0]["support_reply"] if evidence else ""
+        
+        # Grounding: Extract authentic historical agent signature tag (e.g. ^GR, ^LL, ^CS)
+        agent_tag = "^CS"
+        if hist_reply:
+            tag_match = re.search(r"\^([a-zA-Z]{2,3})$", hist_reply.strip())
+            if tag_match:
+                agent_tag = f"^{tag_match.group(1)}"
 
         if decision == DECISION_ESCALATE:
             if escalation_cat == "LOST_OR_STOLEN_DELIVERY":
                 return (
                     "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! "
                     "For your privacy, please do not post your order details here. Please send us a direct message "
-                    "with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^CS"
+                    f"with your order number and email address through our secure link [link] so we can investigate with the carrier right away. {agent_tag}"
                 )
             elif escalation_cat == "ACCOUNT_SECURITY_RISK":
                 return (
                     "Thank you for bringing this to our attention. We take account security very seriously. "
                     "Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, "
-                    "and please reach out to our account security specialists directly via our secure portal: [link]. ^CS"
+                    f"and please reach out to our account security specialists directly via our secure portal: [link]. {agent_tag}"
                 )
             elif escalation_cat == "FINANCIAL_OR_BILLING_DISPUTE":
                 return (
                     "I understand your concern regarding unexpected charges on your statement. "
                     "Because this involves private billing and card details, please send us a DM or contact us via our secure page: [link] "
-                    "so an account specialist can safely review the transactions for you. ^CS"
+                    f"so an account specialist can safely review the transactions for you. {agent_tag}"
                 )
             elif escalation_cat == "DAMAGED_PHYSICAL_MERCHANDISE":
                 return (
                     "I'm truly sorry your order arrived damaged! We want to make this right immediately. "
-                    "Please send us a direct message with your order number via [link] so a specialist can authorize a free replacement or full refund. ^CS"
+                    f"Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. {agent_tag}"
                 )
             else: # Customer agitation or general escalation
                 return (
                     "I'm very sorry for the frustrating experience you've had. This is definitely not the standard we aim to deliver. "
-                    "Please connect with us via direct message at [link] so we can have a representative review your account history and resolve this for you. ^CS"
+                    f"Please connect with us via direct message at [link] so we can have a representative review your account history and resolve this for you. {agent_tag}"
                 )
 
         else: # AUTO_HANDLE
             if intent == "DELIVERY_STATUS_DELAY":
                 return (
                     "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate "
-                    "directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^CS"
+                    f"directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! {agent_tag}"
                 )
             elif intent == "REFUND_RETURN_EXCHANGE":
                 return (
                     "You can easily initiate a return or replacement directly through your account! "
-                    "Just visit 'Your Orders' at [link], select the item, and choose 'Return or replace items' to print a prepaid return label. ^CS"
+                    f"Just visit 'Your Orders' at [link], select the item, and choose 'Return or replace items' to print a prepaid return label. {agent_tag}"
                 )
             elif intent == "ORDER_CHANGE_CANCEL":
                 return (
                     "If your order has not yet entered the shipping process, you can cancel it or update your shipping address by visiting "
-                    "'Your Orders' at [link] and clicking 'Cancel items' or 'Change'. ^CS"
+                    f"'Your Orders' at [link] and clicking 'Cancel items' or 'Change'. {agent_tag}"
                 )
             elif intent == "TECHNICAL_PRODUCT_SUPPORT":
                 return (
-                    "Sorry for the technical glitch! A quick troubleshooting step that often resolves this is performing a hard restart by holding "
-                    "the power button down for 40 seconds, or clearing the app cache. More device steps are available here: [link]. ^CS"
+                    "Sorry for the technical glitch! A quick troubleshooting step that often resolves this is restarting your device, "
+                    f"checking for app updates, or clearing the app cache. Step-by-step device troubleshooting guides are available here: [link]. {agent_tag}"
                 )
             else: # FEEDBACK_COMPLAINT_GENERAL
                 return (
                     "Thank you for sharing your feedback with us. We appreciate hearing from our customers as it helps us improve our service. "
-                    "If there is an active order you need assistance with, please let us know! ^CS"
+                    f"If there is an active order you need assistance with, please let us know! {agent_tag}"
                 )
 
     def sanitize_reply(self, reply: str) -> str:

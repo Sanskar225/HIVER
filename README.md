@@ -41,8 +41,8 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 ### 1. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/hiver-ai-support.git
-cd hiver-ai-support
+git clone https://github.com/Sanskar225/HIVER.git
+cd HIVER
 
 # Install dependencies
 pip install -r requirements.txt
@@ -70,7 +70,7 @@ python -m src.cli "My package says delivered yesterday but it was never left on 
   "decision": "ESCALATE",
   "escalation_category": "LOST_OR_STOLEN_DELIVERY",
   "reason": "Deterministic safety rule triggered: lost or stolen delivery detected in customer message.",
-  "reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^CS",
+  "reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^SP",
   "evidence": [
     {
       "conversation_id": "2914a1fb2db85fc284151b3c52462070",
@@ -107,15 +107,15 @@ python -m src.cli "My package says delivered yesterday but it was never left on 
               │                 │
               └────────┬────────┘
                        ▼
-                REPLY GENERATOR
-             (PII-Safe Brand Voice)
-                       │
-                       ▼
-              RESPONSE SANITIZER
-             (PII & Channel Guard)
-                       │
-                       ▼
-                  FINAL JSON
+                 REPLY GENERATOR
+        (Retrieval-Conditioned Brand Voice)
+                        │
+                        ▼
+               RESPONSE SANITIZER
+              (PII & Channel Guard)
+                        │
+                        ▼
+                   FINAL JSON
 ```
 
 ---
@@ -123,12 +123,12 @@ python -m src.cli "My package says delivered yesterday but it was never left on 
 ## 📂 Repository Structure
 
 ```
-hiver-ai-support/
+HIVER/
 ├── README.md                      # Marketing page, quickstart, and headline benchmark table
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
-├── DECISION_LOG.md                # 14 non-obvious engineering decisions and their rationales
+├── DECISION_LOG.md                # 16 non-obvious engineering decisions and their rationales
 ├── requirements.txt               # Lightweight Python dependencies
-├── run_pipeline.py                # Master reproduction script (executes in 11.8 seconds)
+├── run_pipeline.py                # Master reproduction script (executes in ~19 seconds)
 │
 ├── data/
 │   ├── raw/                       # Original multi-turn conversation dataset
@@ -166,4 +166,4 @@ hiver-ai-support/
 
 ## 📑 Core Documentation Links
 - **[Full 6-Page Technical Report](REPORT.md)**: In-depth problem framing, multi-brand audit scoring matrix, failure analysis, and the mandatory *"What is misleading about my headline number?"* critique.
-- **[Engineering Decision Log](DECISION_LOG.md)**: 14 non-obvious architectural decisions, trade-offs, and design rationales.
+- **[Engineering Decision Log](DECISION_LOG.md)**: 16 non-obvious architectural decisions, trade-offs, and design rationales.

@@ -14,11 +14,11 @@ The 200 golden examples were sampled from a strictly held-out candidate pool of 
 1. **Stratification Across 8 Intents**:
    To prevent class imbalance from distorting metrics (where general feedback represented ~38% of raw Twitter volume), we established strict category quotas:
    - `BILLING_SUBSCRIPTION_PRIME`: 45 cases (22.5%)
-   - `DAMAGED_WRONG_MISSING`: 28 cases (14.0%)
-   - `FEEDBACK_COMPLAINT_GENERAL`: 26 cases (13.0%)
-   - `REFUND_RETURN_EXCHANGE`: 23 cases (11.5%)
+   - `DAMAGED_WRONG_MISSING`: 27 cases (13.5%)
+   - `FEEDBACK_COMPLAINT_GENERAL`: 27 cases (13.5%)
+   - `REFUND_RETURN_EXCHANGE`: 22 cases (11.0%)
+   - `ACCOUNT_SECURITY_ACCESS`: 21 cases (10.5%)
    - `DELIVERY_STATUS_DELAY`: 20 cases (10.0%)
-   - `ACCOUNT_SECURITY_ACCESS`: 20 cases (10.0%)
    - `ORDER_CHANGE_CANCEL`: 19 cases (9.5%)
    - `TECHNICAL_PRODUCT_SUPPORT`: 19 cases (9.5%)
 
@@ -28,8 +28,8 @@ The 200 golden examples were sampled from a strictly held-out candidate pool of 
    - **Adversarial Cases (20)**: Sarcasm, extreme customer hostility/legal threats, carrier property damage, and ambiguous fragments.
 
 3. **Balanced Triage Boundary**:
-   - **`ESCALATE`**: 102 cases (51.0%)
-   - **`AUTO_HANDLE`**: 98 cases (49.0%)
+   - **`ESCALATE`**: 104 cases (52.0%)
+   - **`AUTO_HANDLE`**: 96 cases (48.0%)
    This near-50/50 balance ensures that triage accuracy and safe auto-handle precision cannot be achieved through majority-class guessing.
 
 ---

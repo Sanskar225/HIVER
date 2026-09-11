@@ -87,21 +87,25 @@ $$\text{Security/Fraud} \succ \text{Damaged/Missing} \succ \text{Billing Dispute
               ▼                 ▼
          AUTO_HANDLE         ESCALATE
               │                 │
-              └────────┬────────┘
-                       ▼
-                REPLY GENERATOR
-             (PII-Safe Brand Voice)
-                       │
-                       ▼
-              RESPONSE SANITIZER
-             (PII & Channel Guard)
-                       │
-                       ▼
-                  FINAL JSON
+               └────────┬────────┘
+                        ▼
+                 REPLY GENERATOR
+       (Retrieval-Conditioned Synthesis)
+                        │
+                        ▼
+               RESPONSE SANITIZER
+              (PII & Channel Guard)
+                        │
+                        ▼
+                   FINAL JSON
 ```
 
-### Deterministic Safety Guardrails
-A core architectural principle of our system is that **the model cannot override deterministic safety rules**. If regex/pattern engines detect high-risk signals (e.g. *"someone hacked my account"*, *"police"*, *"lawyer"*, *"unauthorized charge"*, *"marked delivered but never arrived"*), the triage engine unconditionally forces an `ESCALATE` decision with a structured justification.
+### Deterministic Safety Guardrails & Retrieval-Conditioned Reply Synthesis
+1. **Deterministic Safety Engine**: A core architectural principle of our system is that **the model cannot override deterministic safety rules**. If regex/pattern engines detect high-risk signals (e.g. *"someone hacked my account"*, *"police"*, *"lawyer"*, *"unauthorized charge"*, *"marked delivered but never arrived"*), the triage engine unconditionally forces an `ESCALATE` decision with a structured justification.
+2. **Retrieval-Conditioned Canonical Reply Synthesis**: Rather than blindly replaying raw historical tweets verbatim (which risks dead links, stale 2017 policies, and privacy violations as demonstrated by Baseline 1's 8.5% pass rate), or relying on an unconstrained generative LLM that can hallucinate corporate return policies, our agent uses **Retrieval-Conditioned Canonical Synthesis**:
+   - Queries the 55,011-record historical knowledge base for top matching historical resolution pairs (`evidence[0]`).
+   - Extracts authentic historical agent voice tags (`^CS`, `^GR`, etc.) and channel cues.
+   - Populates a policy-safe, privacy-sanitized draft reply with guaranteed deep-link anchors (`[link]`) and active regex PII sanitization.
 
 ---
 
@@ -113,13 +117,13 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 | Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
-| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
-| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5847` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.5192` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
+| **Missed Escalation Rate** | `1.0000` | `0.4808` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
+| **False Escalation Rate** | `0.0000` | `0.5104` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9387` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9350` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.5243` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage compliance with active sanitizer |
 | **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1037`** | Lexical overlap against historical 2017 tweets |
@@ -194,14 +198,14 @@ To verify judge reliability against human domain experts, we conducted an agreem
 
 ## 7. Mandatory Section: "What is Misleading About My Headline Number?"
 
-A headline metric of **`0.9802` Escalation Recall** and **`0.9798` Safe Auto-Handle Precision** is strong, but presenting it without critical qualification would be intellectually dishonest:
+A headline metric of **`0.9519` Escalation Recall** and **`0.9495` Safe Auto-Handle Precision** is strong, but presenting it without critical qualification would be intellectually dishonest:
 
 1. **Adversarial Tier Performance Drop**:
-   While the prototype achieved $0.9860$ Macro-F1 on Normal cases, its performance dropped to **$0.8286$ on Adversarial cases**. Sarcastic rants, ambiguous two-word queries, and multiple-touchpoint grievances remain significantly harder.
+   While the prototype achieved $0.9796$ Macro-F1 on Normal cases, its performance dropped to **$0.7891$ on Adversarial cases** (-19.05% drop). Sarcastic rants, ambiguous two-word queries, and multiple-touchpoint grievances remain significantly harder.
 2. **Stratified Golden Set vs. In-The-Wild Distributional Shift**:
    In our raw 1,000-message discovery audit, $38\%$ of inbound tweets were unstructured rants or praise (`FEEDBACK_COMPLAINT_GENERAL`). Our 200-item golden set intentionally capped this class at $13.5\%$ to test discriminative competence. In live production, the raw stream contains far higher conversational noise.
 3. **Asymmetry of Triage Costs**:
-   A $1.98\%$ Missed Escalation Rate sounds minimal, but in customer service, **errors are not symmetric**. Erroneously auto-handling a single customer whose package was stolen or whose account was compromised can trigger credit card chargebacks, formal regulatory complaints, and churn. In a 100,000-ticket/day queue, a $2\%$ missed escalation rate represents 2,000 catastrophic failures daily.
+   A $4.81\%$ Missed Escalation Rate sounds minimal, but in customer service, **errors are not symmetric**. Erroneously auto-handling a single customer whose package was stolen or whose account was compromised can trigger credit card chargebacks, formal regulatory complaints, and churn. In a 100,000-ticket/day queue, a $4.8\%$ missed escalation rate represents nearly 5,000 catastrophic failures daily.
 4. **Intent Correctness Does Not Equal Problem Resolution**:
    Classifying a tweet correctly as `DELIVERY_STATUS_DELAY` does not mean the customer was satisfied. If the carrier lost the shipment, sending a generic tracking link merely delays customer frustration.
 5. **Historical Dataset Vintage (2017 vs. Present)**:

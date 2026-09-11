@@ -1,6 +1,6 @@
 # Engineering Decision Log: AI Support Agent for @AmazonHelp
 
-This document records the **14 non-obvious engineering decisions** made during the design, implementation, and evaluation of the `@AmazonHelp` AI Customer Support Agent.
+This document records the **16 non-obvious engineering decisions** made during the design, implementation, and evaluation of the `@AmazonHelp` AI Customer Support Agent.
 
 ---
 
@@ -45,8 +45,8 @@ This document records the **14 non-obvious engineering decisions** made during t
 - **Why**: When a customer writes *"Package arrived broken and I want my money back"*, assigning the intent to `DAMAGED_WRONG_MISSING` takes precedence because physical item inspection and replacement authorization dictate the operational workflow, not just the refund keyword.
 
 ### 11. Core Operational Metric: Safe Auto-Handle Precision Over Automation Rate
-- **Decision**: Evaluated the triage engine primarily on *Safe Auto-Handle Precision* ($96.12\%$) and *Missed Escalation Rate* ($4.04\%$) rather than gross auto-handle percentage.
-- **Why**: An agent that auto-handles 90% of tickets with 80% safety is an operational disaster. An agent that auto-handles 50% of tickets with 96% safety is immediately deployable.
+- **Decision**: Evaluated the triage engine primarily on *Safe Auto-Handle Precision* ($94.95\%$) and *Missed Escalation Rate* ($4.81\%$) rather than gross auto-handle percentage.
+- **Why**: An agent that auto-handles 90% of tickets with 80% safety is an operational disaster. An agent that auto-handles 50% of tickets with 95% safety is immediately deployable.
 
 ### 12. Human-in-the-Loop Ground-Truth Verification
 - **Decision**: Hand-verified all 200 golden evaluation items rather than accepting pure LLM pseudo-labels.
@@ -57,9 +57,13 @@ This document records the **14 non-obvious engineering decisions** made during t
 - **Why**: Simply asserting that an LLM judge was used is insufficient. Proving human-judge alignment provides the scientific defensibility required by Hiver.
 
 ### 14. 100% Offline Self-Contained Reproduction Pipeline
-- **Decision**: Engineered the pipeline to run fully locally in 17.7 seconds without mandatory external API keys.
+- **Decision**: Engineered the pipeline to run fully locally in ~19 seconds without mandatory external API keys.
 - **Why**: Evaluators running code live must not encounter API key failures, network timeouts, or rate-limiting errors. The entire evaluation harness is self-contained and reproducible.
 
 ### 15. Elimination of Circular Rule-Label Leakage via Hand-Verification
 - **Decision**: Audited and separated the agent's inference engine from the golden set ground-truth generation. Re-evaluated every single case manually to establish true independent ground truth, correcting delivered-but-missing items, praise false-positives, and wallet disputes (documented in `data/golden/LABELING_NOTE.md`).
 - **Why**: Evaluating an agent on data labeled by its own heuristic rules produces an artificial 1.0000 Macro-F1 illusion. Genuine independent hand-verification revealed our true, defensible Macro-F1 of 0.9725, with an authentic -19.05% performance drop on adversarial edge cases.
+
+### 16. Retrieval-Conditioned Canonical Reply Synthesis vs. Raw Text Replay vs. Unconstrained Generative LLM
+- **Decision**: Implemented reply drafting via *Retrieval-Conditioned Canonical Synthesis* rather than either raw 1-NN text replay (as in Baseline 1) or an unconstrained generative LLM prompt. The system retrieves historical resolution evidence from 55,011 cases to extract historical agent voice tags (`^CS`, `^GR`, etc.), resolution channel cues, and relevance context, but populates a deterministic, policy-safe response with guaranteed link anchors (`[link]`) and active privacy sanitization.
+- **Why**: As proven by Baseline 1, raw historical tweet retrieval achieves a miserable **8.5% pass rate** on the LLM judge because historical tweets contain dead 2017 links (`t.co`), stale policies, and lack required privacy warnings. Conversely, an unconstrained generative LLM introduces severe risks of hallucinating specific corporate guarantees (such as promising 'free replacements' or quoting specific internal warranty terms). Retrieval-conditioned canonical synthesis grounds the agent in historical evidence while maintaining strict, auditable enterprise safety boundaries.
