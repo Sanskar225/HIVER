@@ -3,7 +3,7 @@
 > **Brand Selected**: `@AmazonHelp` (E-Commerce & Digital Logistics)  
 > **System Status**: Evaluation-First Support-Agent Prototype (Production-Minded)  
 > **Core Operating Philosophy**: *"The objective is not maximum automation. The objective is maximum safe resolution."*  
-> **Reproducibility**: Entire evaluation harness executes in **under 15 seconds** locally with zero external API dependencies.
+> **Reproducibility**: Entire evaluation harness executes in **under 1 minute** locally with zero external API dependencies.
 
 ---
 
@@ -15,24 +15,24 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 
 | Evaluation Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
-| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
-| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5847` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.5192` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
+| **Missed Escalation Rate** | `1.0000` | `0.4808` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
+| **False Escalation Rate** | `0.0000` | `0.5104` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9387` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9350` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.5243` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage public channel privacy compliance |
 | **Judge-Human Agreement ($\kappa$)**| N/A | N/A | **`0.9099`** | Calibrated Quadratic Weighted Kappa on 50 hand-annotated pairs |
 
 ### Key Finding
 > **Deterministic safety guardrails prevent operational disasters.**  
-> While simple keyword models miss over **61.5% of escalations**, our deterministic triage engine constrains the Missed Escalation Rate to **4.81%**, guaranteeing that stolen packages, account lockouts, and financial disputes never receive robotic, unhelpful canned replies.
+> While simple keyword models miss over **48% of escalations**, our deterministic triage engine reduces the Missed Escalation Rate to **4.81%**, substantially improving coverage of stolen-package, account-security, and financial-risk cases.
 
 ### Biggest Limitation
 > **Historical data is evidence of past behavior, not current policy.**  
-> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, Macro-F1 on adversarial edge cases drops from **0.9796 to 0.7891** (-19.05%), underscoring that subtle sarcasm and multi-touchpoint customer frustration remain non-trivial challenge areas. [Read the full Sampling & Hand-Labeling Note](data/golden/LABELING_NOTE.md).
+> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, the adversarial tier has materially lower Macro-F1 than the normal tier (0.7891 vs. 0.9796); qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors. [Read the full Sampling & Hand-Labeling Note](data/golden/LABELING_NOTE.md).
 
 ---
 
@@ -48,7 +48,7 @@ cd HIVER
 pip install -r requirements.txt
 ```
 
-### 2. Run the Full Evaluation Pipeline (< 30 Seconds)
+### 2. Run the Full Evaluation Pipeline (Typically < 1 Minute)
 ```bash
 python run_pipeline.py
 ```
@@ -128,7 +128,7 @@ HIVER/
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
 ├── DECISION_LOG.md                # 16 non-obvious engineering decisions and their rationales
 ├── requirements.txt               # Lightweight Python dependencies
-├── run_pipeline.py                # Master reproduction script (executes in ~19 seconds)
+├── run_pipeline.py                # Master reproduction script (typically < 1 minute)
 │
 ├── data/
 │   ├── raw/                       # Original multi-turn conversation dataset

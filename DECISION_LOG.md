@@ -57,12 +57,12 @@ This document records the **16 non-obvious engineering decisions** made during t
 - **Why**: Simply asserting that an LLM judge was used is insufficient. Proving human-judge alignment provides the scientific defensibility required by Hiver.
 
 ### 14. 100% Offline Self-Contained Reproduction Pipeline
-- **Decision**: Engineered the pipeline to run fully locally in ~19 seconds without mandatory external API keys.
+- **Decision**: Engineered the pipeline to run fully locally in under 1 minute without mandatory external API keys.
 - **Why**: Evaluators running code live must not encounter API key failures, network timeouts, or rate-limiting errors. The entire evaluation harness is self-contained and reproducible.
 
 ### 15. Elimination of Circular Rule-Label Leakage via Hand-Verification
 - **Decision**: Audited and separated the agent's inference engine from the golden set ground-truth generation. Re-evaluated every single case manually to establish true independent ground truth, correcting delivered-but-missing items, praise false-positives, and wallet disputes (documented in `data/golden/LABELING_NOTE.md`).
-- **Why**: Evaluating an agent on data labeled by its own heuristic rules produces an artificial 1.0000 Macro-F1 illusion. Genuine independent hand-verification revealed our true, defensible Macro-F1 of 0.9725, with an authentic -19.05% performance drop on adversarial edge cases.
+- **Why**: Evaluating an agent on data labeled by its own heuristic rules produces an artificial 1.0000 Macro-F1 illusion. Genuine independent hand-verification revealed our true, defensible Macro-F1 of 0.9725, while exposing a materially lower Macro-F1 of 0.7891 on the 20-case adversarial tier.
 
 ### 16. Retrieval-Conditioned Canonical Reply Synthesis vs. Raw Text Replay vs. Unconstrained Generative LLM
 - **Decision**: Implemented reply drafting via *Retrieval-Conditioned Canonical Synthesis* rather than either raw 1-NN text replay (as in Baseline 1) or an unconstrained generative LLM prompt. The system retrieves historical resolution evidence from 55,011 cases to extract historical agent voice tags (`^CS`, `^GR`, etc.), resolution channel cues, and relevance context, but populates a deterministic, policy-safe response with guaranteed link anchors (`[link]`) and active privacy sanitization.

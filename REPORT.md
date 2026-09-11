@@ -134,7 +134,7 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9796`** | Clean single-intent queries |
 | **Difficult Cases** | 40 | `0.0081` | `0.8306` | **`1.0000`** | Nuanced multi-intent queries |
-| **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | **-19.05% Drop**: Sarcasm, hostility, extreme rants |
+| **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | Material drop; qualitative review highlights sarcasm, ambiguity, hostility |
 
 ---
 
@@ -201,7 +201,7 @@ To verify judge reliability against human domain experts, we conducted an agreem
 A headline metric of **`0.9519` Escalation Recall** and **`0.9495` Safe Auto-Handle Precision** is strong, but presenting it without critical qualification would be intellectually dishonest:
 
 1. **Adversarial Tier Performance Drop**:
-   While the prototype achieved $0.9796$ Macro-F1 on Normal cases, its performance dropped to **$0.7891$ on Adversarial cases** (-19.05% drop). Sarcastic rants, ambiguous two-word queries, and multiple-touchpoint grievances remain significantly harder.
+   The adversarial tier has materially lower Macro-F1 than the normal tier ($0.7891$ vs. $0.9796$). Qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors across these 20 edge cases, rather than a single causal mechanism.
 2. **Stratified Golden Set vs. In-The-Wild Distributional Shift**:
    In our raw 1,000-message discovery audit, $38\%$ of inbound tweets were unstructured rants or praise (`FEEDBACK_COMPLAINT_GENERAL`). Our 200-item golden set intentionally capped this class at $13.5\%$ to test discriminative competence. In live production, the raw stream contains far higher conversational noise.
 3. **Asymmetry of Triage Costs**:
