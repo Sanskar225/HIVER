@@ -15,24 +15,24 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 
 | Evaluation Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4950` | `0.5571` | **`0.9798`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3861` | **`0.9802`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
-| **Missed Escalation Rate** | `1.0000` | `0.6139` | **`0.0198`** | **Critical Safety Failure**: true risk queries dangerously automated |
-| **False Escalation Rate** | `0.0000` | `0.2121` | **`0.0202`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0238` | `0.9142` | **`0.9834`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1050` | `0.9100` | **`0.9850`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6500` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage public channel privacy compliance |
 | **Judge-Human Agreement ($\kappa$)**| N/A | N/A | **`0.9099`** | Calibrated Quadratic Weighted Kappa on 50 hand-annotated pairs |
 
 ### Key Finding
 > **Deterministic safety guardrails prevent operational disasters.**  
-> While simple keyword models miss over **61.4% of escalations**, our deterministic triage engine constrains the Missed Escalation Rate to **1.98%**, guaranteeing that stolen packages, account lockouts, and financial disputes never receive robotic, unhelpful canned replies.
+> While simple keyword models miss over **61.5% of escalations**, our deterministic triage engine constrains the Missed Escalation Rate to **4.81%**, guaranteeing that stolen packages, account lockouts, and financial disputes never receive robotic, unhelpful canned replies.
 
 ### Biggest Limitation
 > **Historical data is evidence of past behavior, not current policy.**  
-> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, Macro-F1 on adversarial edge cases drops from **0.9860 to 0.8286**, underscoring that subtle sarcasm and multi-touchpoint customer frustration remain non-trivial challenge areas.
+> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, Macro-F1 on adversarial edge cases drops from **0.9796 to 0.7891** (-19.05%), underscoring that subtle sarcasm and multi-touchpoint customer frustration remain non-trivial challenge areas. [Read the full Sampling & Hand-Labeling Note](data/golden/LABELING_NOTE.md).
 
 ---
 

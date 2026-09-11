@@ -113,13 +113,13 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 | Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4950` | `0.5571` | **`0.9798`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3861` | **`0.9802`** | **Hero Metric**: coverage of critical security and financial risks |
-| **Missed Escalation Rate** | `1.0000` | `0.6139` | **`0.0198`** | **Critical Safety Failure**: true risks erroneously automated |
-| **False Escalation Rate** | `0.0000` | `0.2121` | **`0.0202`** | Human queue pollution / unnecessary agent overhead |
-| **Intent Macro-F1** | `0.0238` | `0.9142` | **`0.9834`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1050` | `0.9100` | **`0.9850`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6500` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% Zero-leakage compliance with active sanitizer |
 | **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1037`** | Lexical overlap against historical 2017 tweets |
@@ -128,9 +128,9 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 | Difficulty Tier | Sample Count | Baseline 0 | Baseline 1 | Proposed AI Agent | Performance Drop (Adversarial vs Normal) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Normal Cases** | 140 | `0.0256` | `0.9454` | **`0.9860`** | Clean single-intent queries |
+| **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9796`** | Clean single-intent queries |
 | **Difficult Cases** | 40 | `0.0081` | `0.8306` | **`1.0000`** | Nuanced multi-intent queries |
-| **Adversarial Cases** | 20 | `0.0556` | `0.7481` | **`0.8286`** | **-15.74% Drop**: Sarcasm, hostility, extreme rants |
+| **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | **-19.05% Drop**: Sarcasm, hostility, extreme rants |
 
 ---
 

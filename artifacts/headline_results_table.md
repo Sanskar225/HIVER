@@ -9,13 +9,13 @@
 
 | Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Metric Priority / Safety Implication |
 | :--- | :---: | :---: | :---: | :--- |
-| **Intent Macro-F1** | `0.0238` | `0.9142` | **`0.9834`** | **Primary Intent Metric** (unskewed by class imbalance) |
-| **Intent Overall Accuracy** | `0.1050` | `0.9100` | **`0.9850`** | Overall classification correctness |
-| **Safe Auto-Handle Precision** | `0.4950` | `0.5571` | **`0.9798`** | **Primary Safety Metric** (when auto-handling, is it truly safe?) |
-| **Missed Escalation Rate** | `1.0000` | `0.6139` | **`0.0198`** | **Critical Hazard** (true risk queries dangerously auto-handled) |
-| **False Escalation Rate** | `0.0000` | `0.2121` | **`0.0202`** | Over-escalation rate (queue cost / human agent burden) |
-| **Escalation Recall** | `0.0000` | `0.3861` | **`0.9802`** | Coverage of critical security/financial risks |
-| **Escalation Precision** | `0.0000` | `0.6500` | **`0.9802`** | Cleanliness of human triage queue |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | **Primary Intent Metric** (unskewed by class imbalance) |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Overall classification correctness |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Primary Safety Metric** (when auto-handling, is it truly safe?) |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Hazard** (true risk queries dangerously auto-handled) |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (queue cost / human agent burden) |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | Coverage of critical security/financial risks |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Cleanliness of human triage queue |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.7650`** | Multi-criteria LLM Judge Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | Zero-leakage compliance (protecting customer identity) |
 | **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1037`** | Lexical alignment with historical Amazon resolutions |
@@ -26,9 +26,9 @@
 
 | Difficulty Tier | Sample Count | Baseline 0 | Baseline 1 | Proposed AI Agent | Performance Drop (Adversarial vs Normal) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Normal Cases** | 140 | `0.0256` | `0.9454` | **`0.9860`** | Baseline reference |
+| **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9796`** | Baseline reference |
 | **Difficult Cases** | 40 | `0.0081` | `0.8306` | **`1.0000`** | Nuanced multi-intent queries |
-| **Adversarial Cases** | 20 | `0.0556` | `0.7481` | **`0.8286`** | High-friction / sarcasm / hostility |
+| **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | High-friction / sarcasm / hostility |
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "target_brand": "@AmazonHelp",
-    "eval_timestamp": "2026-09-11 10:44:39 UTC",
+    "eval_timestamp": "2026-09-11 13:27:29 UTC",
     "golden_sample_size": 200,
     "kb_corpus_size": 55011
   },
@@ -10,9 +10,9 @@
       "system_name": "Trivial Baseline",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.0238,
-        "intent_accuracy": 0.105,
-        "safe_auto_handle_precision": 0.495,
+        "intent_macro_f1": 0.0227,
+        "intent_accuracy": 0.1,
+        "safe_auto_handle_precision": 0.48,
         "missed_escalation_rate": 1.0,
         "false_escalation_rate": 0.0,
         "escalation_recall": 0.0,
@@ -22,8 +22,8 @@
       },
       "triage_confusion_counts": {
         "true_escalations_caught (TP)": 0,
-        "missed_escalations (FN - SAFETY HAZARD)": 101,
-        "safe_auto_handled (TN)": 99,
+        "missed_escalations (FN - SAFETY HAZARD)": 104,
+        "safe_auto_handled (TN)": 96,
         "false_escalations (FP - OVER-ESCALATION)": 0
       },
       "lexical_diagnostics": {
@@ -44,16 +44,16 @@
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.0556,
-          "accuracy": 0.2
+          "macro_f1": 0.0435,
+          "accuracy": 0.15
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.105,
+          "precision": 0.1,
           "recall": 1.0,
-          "f1": 0.19,
-          "support": 21
+          "f1": 0.1818,
+          "support": 20
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 0.0,
@@ -83,7 +83,7 @@
           "precision": 0.0,
           "recall": 0.0,
           "f1": 0.0,
-          "support": 20
+          "support": 21
         },
         "TECHNICAL_PRODUCT_SUPPORT": {
           "precision": 0.0,
@@ -103,21 +103,21 @@
       "system_name": "Simple Baseline",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.9142,
-        "intent_accuracy": 0.91,
-        "safe_auto_handle_precision": 0.5571,
-        "missed_escalation_rate": 0.6139,
-        "false_escalation_rate": 0.2121,
-        "escalation_recall": 0.3861,
-        "escalation_precision": 0.65,
+        "intent_macro_f1": 0.9039,
+        "intent_accuracy": 0.9,
+        "safe_auto_handle_precision": 0.5429,
+        "missed_escalation_rate": 0.6154,
+        "false_escalation_rate": 0.2083,
+        "escalation_recall": 0.3846,
+        "escalation_precision": 0.6667,
         "pii_safety_rate": 1.0,
         "grounded_reply_pass_rate": 0.085
       },
       "triage_confusion_counts": {
-        "true_escalations_caught (TP)": 39,
-        "missed_escalations (FN - SAFETY HAZARD)": 62,
-        "safe_auto_handled (TN)": 78,
-        "false_escalations (FP - OVER-ESCALATION)": 21
+        "true_escalations_caught (TP)": 40,
+        "missed_escalations (FN - SAFETY HAZARD)": 64,
+        "safe_auto_handled (TN)": 76,
+        "false_escalations (FP - OVER-ESCALATION)": 20
       },
       "lexical_diagnostics": {
         "rouge_1": 0.1929,
@@ -127,8 +127,8 @@
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 0.9454,
-          "accuracy": 0.9429
+          "macro_f1": 0.9389,
+          "accuracy": 0.9357
         },
         "difficult": {
           "count": 40,
@@ -137,16 +137,16 @@
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.7481,
-          "accuracy": 0.7
+          "macro_f1": 0.7139,
+          "accuracy": 0.65
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.7241,
+          "precision": 0.6897,
           "recall": 1.0,
-          "f1": 0.84,
-          "support": 21
+          "f1": 0.8163,
+          "support": 20
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 1.0,
@@ -174,9 +174,9 @@
         },
         "ACCOUNT_SECURITY_ACCESS": {
           "precision": 1.0,
-          "recall": 0.95,
-          "f1": 0.9744,
-          "support": 20
+          "recall": 0.9048,
+          "f1": 0.95,
+          "support": 21
         },
         "TECHNICAL_PRODUCT_SUPPORT": {
           "precision": 1.0,
@@ -185,9 +185,9 @@
           "support": 19
         },
         "FEEDBACK_COMPLAINT_GENERAL": {
-          "precision": 0.8065,
-          "recall": 0.9259,
-          "f1": 0.8621,
+          "precision": 0.7742,
+          "recall": 0.8889,
+          "f1": 0.8276,
           "support": 27
         }
       }
@@ -196,20 +196,20 @@
       "system_name": "Proposed Agent",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.9834,
-        "intent_accuracy": 0.985,
-        "safe_auto_handle_precision": 0.9798,
-        "missed_escalation_rate": 0.0198,
-        "false_escalation_rate": 0.0202,
-        "escalation_recall": 0.9802,
+        "intent_macro_f1": 0.9725,
+        "intent_accuracy": 0.975,
+        "safe_auto_handle_precision": 0.9495,
+        "missed_escalation_rate": 0.0481,
+        "false_escalation_rate": 0.0208,
+        "escalation_recall": 0.9519,
         "escalation_precision": 0.9802,
         "pii_safety_rate": 1.0,
         "grounded_reply_pass_rate": 0.765
       },
       "triage_confusion_counts": {
         "true_escalations_caught (TP)": 99,
-        "missed_escalations (FN - SAFETY HAZARD)": 2,
-        "safe_auto_handled (TN)": 97,
+        "missed_escalations (FN - SAFETY HAZARD)": 5,
+        "safe_auto_handled (TN)": 94,
         "false_escalations (FP - OVER-ESCALATION)": 2
       },
       "lexical_diagnostics": {
@@ -220,8 +220,8 @@
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 0.986,
-          "accuracy": 0.9857
+          "macro_f1": 0.9796,
+          "accuracy": 0.9786
         },
         "difficult": {
           "count": 40,
@@ -230,16 +230,16 @@
         },
         "adversarial": {
           "count": 20,
-          "macro_f1": 0.8286,
-          "accuracy": 0.95
+          "macro_f1": 0.7891,
+          "accuracy": 0.9
         }
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.913,
+          "precision": 0.8696,
           "recall": 1.0,
-          "f1": 0.9545,
-          "support": 21
+          "f1": 0.9302,
+          "support": 20
         },
         "DAMAGED_WRONG_MISSING": {
           "precision": 1.0,
@@ -267,9 +267,9 @@
         },
         "ACCOUNT_SECURITY_ACCESS": {
           "precision": 1.0,
-          "recall": 1.0,
-          "f1": 1.0,
-          "support": 20
+          "recall": 0.9524,
+          "f1": 0.9756,
+          "support": 21
         },
         "TECHNICAL_PRODUCT_SUPPORT": {
           "precision": 1.0,
@@ -278,9 +278,9 @@
           "support": 19
         },
         "FEEDBACK_COMPLAINT_GENERAL": {
-          "precision": 1.0,
-          "recall": 0.9259,
-          "f1": 0.9615,
+          "precision": 0.96,
+          "recall": 0.8889,
+          "f1": 0.9231,
           "support": 27
         }
       }
