@@ -74,11 +74,13 @@ INTENT_METADATA = {
 # Critical rule: LLM cannot override deterministic safety rules!
 HIGH_RISK_PATTERNS = {
     "ACCOUNT_SECURITY_RISK": re.compile(
-        r"\b(hacked|fraud|compromised|phishing|unauthorized access|scam|stole my identity|otp bypass|someone accessed)\b", 
+        r"\b(hacked|fraud|compromised|phishing|unauthorized access|scam|stole my identity|otp bypass|someone accessed|hacked ho gaya|account hack)\b", 
         re.I
     ),
     "LOST_OR_STOLEN_DELIVERY": re.compile(
-        r"\b(says delivered|marked delivered|never arrived|stolen|porch pirate|box was empty|carrier stole|not received but delivered)\b", 
+        r"\b(says delivered|marked delivered|never arrived|stole|stolen|steal|stealing|theft|thief|thieves|porch pirate|box was empty|carrier stole|not received but delivered|delivered to (the )?wrong address|delivered to (my )?neighbor|taken from (my )?(doorstep|porch|lobby))\b|"
+        r"\b(shows?|says?|marked|claims?)\s+(as\s+)?delivered\b.*\b(not\s+(here|received|arrived)|never\s+(left|received|got)|missing|nowhere|stole|theft|empty)\b|"
+        r"\bdelivered\b.*\b(not\s+received|nowhere to be found|didn't get|never got)\b", 
         re.I
     ),
     "DAMAGED_PHYSICAL_MERCHANDISE": re.compile(
@@ -86,11 +88,11 @@ HIGH_RISK_PATTERNS = {
         re.I
     ),
     "FINANCIAL_OR_BILLING_DISPUTE": re.compile(
-        r"\b(unauthorized charge|charged my card|double charged|unrecognized charge|bank fee|stolen credit card|chargeback)\b", 
+        r"\b(unauthorized charge|charged my card|double charged|unrecognized charge|bank fee|stolen credit card|chargeback|paisa kat|paise kat|amount deduct|extra charge|unauthorized debit)\b", 
         re.I
     ),
     "CUSTOMER_AGITATION_OR_LEGAL_THREAT": re.compile(
-        r"\b(lawyer|attorney|police|court|legal action|consumer court|better business bureau|bbb complaint|lawsuit|unacceptable service|furious|disgusted)\b", 
+        r"\b(human agent|talk to a (human|person|agent|representative)|speak with (a )?(human|person|agent|representative)|customer care executive|connect (me )?to (an? )?agent|transfer (me )?to (an? )?agent|real person|live agent|representative|lawyer|attorney|police|court|legal action|consumer court|better business bureau|bbb complaint|lawsuit|unacceptable service|furious|disgusted)\b", 
         re.I
     )
 }
@@ -117,3 +119,46 @@ def evaluate_deterministic_risk(customer_text: str) -> Tuple[bool, str, str]:
             reason = f"Deterministic safety rule triggered: {category.lower().replace('_', ' ')} detected in customer message."
             return True, category, reason
     return False, "NONE", ""
+
+# High-precision linguistic domain patterns for intent feature extraction & collision handling
+DOMAIN_INTENT_PATTERNS = {
+    "ACCOUNT_SECURITY_ACCESS": re.compile(
+        r"\b(hacked|fraud|unauthorized|phishing|otp|locked out|password|scam|security|compromised|login|someone else accessed|hacked ho gaya|account hack)\b", 
+        re.I
+    ),
+    "DAMAGED_WRONG_MISSING": re.compile(
+        r"\b(damaged|broken|empty box|missing|wrong item|defective|shattered|cracked|ruined|torn|opened package|stole|stolen|steal|stealing|theft|thief|never arrived|delivered to (the )?wrong address|porch pirate)\b|"
+        r"\b(shows?|says?|marked|claims?)\s+(as\s+)?delivered\b.*\b(not\s+(here|received|arrived)|never\s+(left|received|got)|missing|stolen|theft|empty|porch|nowhere)\b|"
+        r"\bdelivered\b.*\b(not\s+received|nowhere\s+to\s+be\s+found|didn't\s+get|never got|stolen|porch)\b", 
+        re.I
+    ),
+    "BILLING_SUBSCRIPTION_PRIME": re.compile(
+        r"\b(prime|membership|subscription|charged|billing|debit|card charged|renew|unrecognized charge|audible fee|annual charge|cashback|amazon pay balance|wallet balance|promotional credit|paisa kat|paise kat)\b", 
+        re.I
+    ),
+    "REFUND_RETURN_EXCHANGE": re.compile(
+        r"\b(refund|return|returning|exchange|money back|pickup|drop off|refunded|send back|return label|replacement|mera refund|paisa wapas|refund nahi mila)\b", 
+        re.I
+    ),
+    "ORDER_CHANGE_CANCEL": re.compile(
+        r"\b(cancel|cancelled|cancellation|change address|modify order|wrong address|change payment|stop delivery)\b", 
+        re.I
+    ),
+    "DELIVERY_STATUS_DELAY": re.compile(
+        r"\b(delivery|deliver|late|delayed|delay|where is|tracking|track|carrier|package|parcel|courier|transit|arrive|arriving|eta|status|not delivered|kab aayega)\b", 
+        re.I
+    ),
+    "TECHNICAL_PRODUCT_SUPPORT": re.compile(
+        r"\b(kindle|fire stick|echo|alexa|app|website|code|voucher|coupon|promo|error|crash|bug|tv app|frozen)\b", 
+        re.I
+    )
+}
+
+def detect_domain_intents(text: str) -> List[str]:
+    """Detect all candidate intents matching domain-specific linguistic patterns."""
+    detected = []
+    for intent, pat in DOMAIN_INTENT_PATTERNS.items():
+        if pat.search(text):
+            detected.append(intent)
+    return detected
+

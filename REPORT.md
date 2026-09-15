@@ -117,22 +117,22 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 | Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security and financial risks |
-| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risks erroneously automated |
-| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9048`** | **Hero Metric**: when choosing Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9038`** | **Hero Metric**: coverage of critical security and financial risks |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0962`** | **Critical Safety Failure**: true risks erroneously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0104`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9672`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9700`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9895`** | Proportion of escalated queries that legitimately require humans |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.8650`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% compliance with deterministic PII-safety rules (zero credential solicitation) |
-| **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1033`** | Lexical overlap against historical 2017 tweets |
+| **ROUGE-L Diagnostic** | `0.1053` | `0.1514` | **`0.1029`** | Lexical overlap against historical 2017 tweets |
 
 ### Performance Breakdown Across Difficulty Tiers (Macro-F1)
 
 | Difficulty Tier | Sample Count | Baseline 0 | Baseline 1 | Proposed AI Agent | Performance Drop (Adversarial vs Normal) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9796`** | Clean single-intent queries |
+| **Normal Cases** | 140 | `0.0256` | `0.9389` | **`0.9733`** | Clean single-intent queries |
 | **Difficult Cases** | 40 | `0.0081` | `0.8306` | **`1.0000`** | Nuanced multi-intent queries |
 | **Adversarial Cases** | 20 | `0.0435` | `0.7139` | **`0.7891`** | Material drop; qualitative review highlights sarcasm, ambiguity, hostility |
 
@@ -208,14 +208,14 @@ Under this rubric:
 
 ## 7. Mandatory Section: "What is Misleading About My Headline Number?"
 
-A headline metric of **`0.9519` Escalation Recall** and **`0.9495` Safe Auto-Handle Precision** is strong, but presenting it without critical qualification would be intellectually dishonest:
+A headline metric of **`0.9038` Escalation Recall** and **`0.9048` Safe Auto-Handle Precision** (with an exceptional **`0.9895` Escalation Precision**) is strong, but presenting it without critical qualification would be intellectually dishonest:
 
 1. **Adversarial Tier Performance Drop**:
-   The adversarial tier has materially lower Macro-F1 than the normal tier ($0.7891$ vs. $0.9796$). Qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors across these 20 edge cases, rather than a single causal mechanism.
+   The adversarial tier has materially lower Macro-F1 than the normal tier ($0.7891$ vs. $0.9733$). Qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors across these 20 edge cases, rather than a single causal mechanism.
 2. **Stratified Golden Set vs. In-The-Wild Distributional Shift**:
    In our raw 1,000-message discovery audit, $38\%$ of inbound tweets were unstructured rants or praise (`FEEDBACK_COMPLAINT_GENERAL`). Our 200-item golden set intentionally capped this class at $13.5\%$ to test discriminative competence. In live production, the raw stream contains far higher conversational noise.
 3. **Asymmetry of Triage Costs**:
-   A $4.81\%$ Missed Escalation Rate sounds minimal, but in customer service, **errors are not symmetric**. Erroneously auto-handling a single customer whose package was stolen or whose account was compromised can trigger credit card chargebacks, formal regulatory complaints, and churn. In a 100,000-ticket/day queue, a $4.8\%$ missed escalation rate represents nearly 5,000 catastrophic failures daily.
+   A $9.62\%$ Missed Escalation Rate sounds modest, but in customer service, **errors are not symmetric**. Erroneously auto-handling a single customer whose package was stolen or whose account was compromised can trigger credit card chargebacks, formal regulatory complaints, and churn. In a 100,000-ticket/day queue, a $9.6\%$ missed escalation rate represents nearly 10,000 customer failure points daily.
 4. **Intent Correctness Does Not Equal Problem Resolution**:
    Classifying a tweet correctly as `DELIVERY_STATUS_DELAY` does not mean the customer was satisfied. If the carrier lost the shipment, sending a generic tracking link merely delays customer frustration.
 5. **Historical Dataset Vintage (2017 vs. Present)**:

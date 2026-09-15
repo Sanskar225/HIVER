@@ -1,7 +1,7 @@
 {
   "metadata": {
     "target_brand": "@AmazonHelp",
-    "eval_timestamp": "2026-09-11 16:09:27 UTC",
+    "eval_timestamp": "2026-09-15 16:40:31 UTC",
     "golden_sample_size": 200,
     "kb_corpus_size": 55011
   },
@@ -196,32 +196,32 @@
       "system_name": "Proposed Agent",
       "sample_size": 200,
       "headline_metrics": {
-        "intent_macro_f1": 0.9725,
-        "intent_accuracy": 0.975,
-        "safe_auto_handle_precision": 0.9495,
-        "missed_escalation_rate": 0.0481,
-        "false_escalation_rate": 0.0208,
-        "escalation_recall": 0.9519,
-        "escalation_precision": 0.9802,
+        "intent_macro_f1": 0.9672,
+        "intent_accuracy": 0.97,
+        "safe_auto_handle_precision": 0.9048,
+        "missed_escalation_rate": 0.0962,
+        "false_escalation_rate": 0.0104,
+        "escalation_recall": 0.9038,
+        "escalation_precision": 0.9895,
         "pii_safety_rate": 1.0,
         "grounded_reply_pass_rate": 0.865
       },
       "triage_confusion_counts": {
-        "true_escalations_caught (TP)": 99,
-        "missed_escalations (FN - SAFETY HAZARD)": 5,
-        "safe_auto_handled (TN)": 94,
-        "false_escalations (FP - OVER-ESCALATION)": 2
+        "true_escalations_caught (TP)": 94,
+        "missed_escalations (FN - SAFETY HAZARD)": 10,
+        "safe_auto_handled (TN)": 95,
+        "false_escalations (FP - OVER-ESCALATION)": 1
       },
       "lexical_diagnostics": {
-        "rouge_1": 0.11,
-        "rouge_2": 0.0111,
-        "rouge_l": 0.1033
+        "rouge_1": 0.1097,
+        "rouge_2": 0.0115,
+        "rouge_l": 0.1029
       },
       "difficulty_tier_breakdown": {
         "normal": {
           "count": 140,
-          "macro_f1": 0.9796,
-          "accuracy": 0.9786
+          "macro_f1": 0.9733,
+          "accuracy": 0.9714
         },
         "difficult": {
           "count": 40,
@@ -236,9 +236,9 @@
       },
       "per_class_intent_metrics": {
         "DELIVERY_STATUS_DELAY": {
-          "precision": 0.8696,
+          "precision": 0.8333,
           "recall": 1.0,
-          "f1": 0.9302,
+          "f1": 0.9091,
           "support": 20
         },
         "DAMAGED_WRONG_MISSING": {
@@ -278,9 +278,9 @@
           "support": 19
         },
         "FEEDBACK_COMPLAINT_GENERAL": {
-          "precision": 0.96,
-          "recall": 0.8889,
-          "f1": 0.9231,
+          "precision": 0.9583,
+          "recall": 0.8519,
+          "f1": 0.902,
           "support": 27
         }
       }

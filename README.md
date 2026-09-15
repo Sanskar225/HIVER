@@ -15,23 +15,23 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 
 | Evaluation Metric | Baseline 0 (Trivial) | Baseline 1 (Simple) | Proposed AI Agent | Real-World Operational Impact |
 | :--- | :---: | :---: | :---: | :--- |
-| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9495`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
-| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9519`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
-| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0481`** | **Critical Safety Failure**: true risk queries dangerously automated |
-| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0208`** | Over-escalation rate (human agent queue bloat & cost) |
-| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9725`** | Unskewed multi-class classification metric |
-| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9750`** | Classification correctness across all 8 intents |
-| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9802`** | Proportion of escalated queries that legitimately require humans |
+| **Safe Auto-Handle Precision** | `0.4800` | `0.5429` | **`0.9048`** | **Hero Metric**: when saying Auto-Handle, is it truly safe? |
+| **Escalation Recall** | `0.0000` | `0.3846` | **`0.9038`** | **Hero Metric**: coverage of critical security, fraud, and theft inquiries |
+| **Missed Escalation Rate** | `1.0000` | `0.6154` | **`0.0962`** | **Critical Safety Failure**: true risk queries dangerously automated |
+| **False Escalation Rate** | `0.0000` | `0.2083` | **`0.0104`** | Over-escalation rate (human agent queue bloat & cost) |
+| **Intent Macro-F1** | `0.0227` | `0.9039` | **`0.9672`** | Unskewed multi-class classification metric |
+| **Intent Overall Accuracy** | `0.1000` | `0.9000` | **`0.9700`** | Classification correctness across all 8 intents |
+| **Escalation Precision** | `0.0000` | `0.6667` | **`0.9895`** | Cleanliness of human triage queue (near-zero false alarms) |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.8650`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | 100% compliance with deterministic PII-safety rules (zero credential solicitation) |
 
 ### Key Finding
 > **Deterministic safety guardrails prevent operational disasters.**  
-> While simple keyword models miss over **61% of escalations**, our deterministic triage engine reduces the Missed Escalation Rate to **4.81%**, substantially improving coverage of stolen-package, account-security, and financial-risk cases.
+> While simple keyword models miss over **61% of escalations**, our deterministic triage engine backed by a calibrated statistical ML model reduces the Missed Escalation Rate to **9.62%** with an exceptional **98.95% Escalation Precision**, ensuring virtually zero false alarms pollute the human supervisor queue.
 
 ### Biggest Limitation
 > **Historical data is evidence of past behavior, not current policy.**  
-> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, the adversarial tier has materially lower Macro-F1 than the normal tier (0.7891 vs. 0.9796); qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors. [Read the full Sampling & Hand-Labeling Note](data/golden/LABELING_NOTE.md).
+> The Twitter Customer Support dataset reflects 2017 operating conditions. Modern Amazon workflows rely on authenticated in-app handoffs that cannot be verified solely from public historical tweets. Furthermore, the adversarial tier has materially lower Macro-F1 than the normal tier (0.7891 vs. 0.9733); qualitative failure analysis suggests sarcasm, hostility, retrospective praise, and ambiguous complaint phrasing as contributing factors. [Read the full Sampling & Hand-Labeling Note](data/golden/LABELING_NOTE.md).
 
 ---
 
@@ -47,11 +47,11 @@ cd HIVER
 pip install -r requirements.txt
 ```
 
-### 2. Run the Automated Pytest Suite (21 Verification Tests)
+### 2. Run the Automated Pytest Suite (31 Verification Tests)
 ```bash
 python -m pytest tests/ -v
 ```
-Executes in ~5 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, reply sanitization, and rubric scoring.
+Executes in ~3.5 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, reply sanitization, multi-turn continuity, and FastAPI endpoints.
 
 ### 3. Run the Full Evaluation Pipeline (Typically < 1 Minute)
 ```bash
@@ -64,63 +64,71 @@ This executes predictions across all 200 Golden Evaluation examples for Baseline
 
 ### 4. Interactive CLI Demo (Try It Live!)
 ```bash
-python -m src.cli "My package says delivered yesterday but it was never left on my porch!"
+python -m src.cli "Package says delivered yesterday but it was never left on my porch!"
 ```
 
 **Output**:
 ```json
 {
   "intent": "DAMAGED_WRONG_MISSING",
-  "intent_confidence": 0.88,
+  "intent_confidence": 0.9187,
   "decision": "ESCALATE",
   "escalation_category": "LOST_OR_STOLEN_DELIVERY",
   "reason": "Deterministic safety rule triggered: lost or stolen delivery detected in customer message.",
-  "reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^SP",
+  "reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^MT",
   "evidence": [
     {
-      "conversation_id": "2914a1fb2db85fc284151b3c52462070",
-      "similarity": 0.5435
+      "conversation_id": "8ae129823a0ea3323658dba53a7c30cb",
+      "similarity": 0.617
     }
   ]
 }
 ```
+
+### 5. Launch Production FastAPI Microservice
+```bash
+uvicorn src.api:app --host 0.0.0.0 --port 8000
+```
+Interactive OpenAPI/Swagger documentation available at `http://localhost:8000/docs`. Supports stateful multi-turn conversation tracking (`/v1/chat`), high-speed queue routing (`/v1/triage`), and system health status (`/health`).
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-                  CUSTOMER TWEET
-                       │
-                       ▼
-                 PREPROCESSING
-                       │
-            ┌──────────┼──────────┐
-            ▼          ▼          ▼
-         Intent     Risk       Hybrid
-       Classifier  Rules     Retrieval
-            │          │      (55k KB)
-            └──────────┼──────────┘
-                       ▼
-                 TRIAGE ENGINE
-          ("Maximize Safe Resolution,
-             Not Automation Rate")
-                       │
-              ┌────────┴────────┐
-              ▼                 ▼
-         AUTO_HANDLE         ESCALATE
-              │                 │
-              └────────┬────────┘
-                       ▼
-                 REPLY GENERATOR
-        (Retrieval-Conditioned Brand Voice)
-                        │
-                        ▼
-               RESPONSE SANITIZER
-              (PII & Channel Guard)
-                        │
-                        ▼
-                   FINAL JSON
+                  CUSTOMER TWEET / CHAT
+                           │
+                           ▼
+                     PREPROCESSING
+                           │
+                ┌──────────┼──────────┐
+                ▼          ▼          ▼
+             Calibrated  Deterministic  Hybrid
+             Statistical  Safety Rules  Retrieval
+             ML Model    (Zero Over-   (55k KB)
+           (P(y|x) probs)   ride)
+                │          │          │
+                └──────────┼──────────┘
+                           ▼
+                     TRIAGE ENGINE
+              ("Maximize Safe Resolution,
+                 Not Automation Rate")
+                           │
+                  ┌────────┴────────┐
+                  ▼                 ▼
+             AUTO_HANDLE         ESCALATE
+                  │                 │
+                  └────────┬────────┘
+                           ▼
+                    REPLY GENERATOR
+           (Functional Retrieval Synthesis)
+                           │
+                           ▼
+                   RESPONSE SANITIZER
+                  (PII & Channel Guard)
+                           │
+                           ▼
+                    FINAL JSON / API
 ```
 
 ---
@@ -132,11 +140,12 @@ HIVER/
 ├── README.md                      # Marketing page, quickstart, and headline benchmark table
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
 ├── DECISION_LOG.md                # 16 non-obvious engineering decisions and their rationales
-├── requirements.txt               # Lightweight Python dependencies (including pytest)
+├── requirements.txt               # Lightweight Python dependencies (including pytest, fastapi)
 ├── run_pipeline.py                # Master reproduction script (typically < 1 minute)
 │
-├── tests/                         # Full automated test suite (21 unit & safety tests)
+├── tests/                         # Full automated test suite (31 unit & safety tests)
 │   ├── test_agent.py              # End-to-end agent behavior, routing & credential sanitization
+│   ├── test_api.py                # FastAPI endpoints (/health, /v1/triage, /v1/chat)
 │   ├── test_data_leakage.py       # Zero conversation ID & customer text overlap checks
 │   ├── test_evaluator.py          # Metric calculations & deterministic reply rubric tests
 │   ├── test_retriever.py          # TF-IDF retrieval accuracy & sub-100ms latency SLA
@@ -156,7 +165,8 @@ HIVER/
 │   ├── data_prep.py               # Leakage-free dataset parsing and partitioning
 │   ├── taxonomy.py                # 8-intent definitions, priority hierarchy & safety rules
 │   ├── retriever.py               # Fast TF-IDF historical case search index (<100ms SLA)
-│   ├── agent.py                   # Production-minded AI Support Agent with response sanitizer
+│   ├── agent.py                   # Calibrated ML AI Support Agent with stateful memory
+│   ├── api.py                     # Production FastAPI service with OpenAPI endpoints
 │   ├── baselines.py               # Baseline 0 (Trivial) and Baseline 1 (Simple)
 │   ├── evaluator.py               # Macro-F1, safety triage metrics, and confusion plotting
 │   ├── llm_judge.py               # Deterministic 4-criteria reply quality rubric
@@ -167,6 +177,7 @@ HIVER/
 └── artifacts/
     ├── evaluation_metrics.json    # Complete JSON dump of all computed metrics
     ├── headline_results_table.md  # Clean Markdown benchmark summary
+    ├── agent_intent_model.pkl     # Cached calibrated statistical intent ML classifier
     ├── failure_analysis.json      # Structured log of all failure edge cases
     ├── confusion_matrix_proposed_agent.png
     ├── confusion_matrix_simple_baseline.png
