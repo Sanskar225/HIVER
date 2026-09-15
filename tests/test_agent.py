@@ -91,3 +91,31 @@ def test_multi_turn_order_number_flow(agent):
     assert res['decision'] == DECISION_ESCALATE
     assert 'received your information' in res['reply']
 
+def test_negation_not_charged_does_not_escalate_billing(agent):
+    # Negation: customer clarifies they were NOT charged extra
+    res = agent.process('I was not charged extra for my prime membership, thank you')
+    assert res['intent'] != 'BILLING_SUBSCRIPTION_PRIME'
+    assert res['escalation_category'] != 'FINANCIAL_OR_BILLING_DISPUTE'
+
+def test_negation_do_not_want_refund_routes_to_delivery(agent):
+    # Negation: customer explicitly rejects refund and asks for package delivery
+    res = agent.process('I do not want a refund, just send my package')
+    assert res['intent'] == 'DELIVERY_STATUS_DELAY'
+    assert res['intent'] != 'REFUND_RETURN_EXCHANGE'
+
+def test_ood_gibberish_confidence_gating_escalates_to_clarification(agent):
+    # OOD / random gibberish must NOT be auto-handled as general feedback
+    res = agent.process('asdfkjhqwerty zxcvbnm plokmijn')
+    assert res['intent_confidence'] < 0.40
+    assert res['decision'] == DECISION_ESCALATE
+    assert res['escalation_category'] == 'AMBIGUOUS_INQUIRY_NEEDS_CLARIFICATION'
+    assert 'clarification' in res['reason'].lower() or 'details' in res['reply'].lower()
+
+def test_low_similarity_evidence_does_not_hallucinate_carrier(agent):
+    # Evidence below 0.12 similarity threshold must not inject spurious historical carrier
+    low_sim_evidence = [{'conversation_id': 'c_fake', 'similarity': 0.05, 'support_reply': 'Checked with Hermes courier. ^XY'}]
+    reply = agent.generate_grounded_reply('Where is my book?', 'DELIVERY_STATUS_DELAY', DECISION_AUTO_HANDLE, 'NONE', low_sim_evidence)
+    assert 'Hermes' not in reply
+    assert reply.endswith('^CS')
+
+

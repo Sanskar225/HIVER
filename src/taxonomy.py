@@ -93,8 +93,9 @@ HIGH_RISK_PATTERNS = {
         re.I
     ),
     "FINANCIAL_OR_BILLING_DISPUTE": re.compile(
-        r"\b(unauthorized charge|charged my card|double charged|unrecognized charge|bank fee|"
-        r"stolen credit card|chargeback|paisa kat|paise kat|amount deduct|extra charge|unauthorized debit)\b",
+        r"\b(?<!not\s)(?<!never\s)(?<!no\s)(?<!wasn't\s)(unauthorized charge|charged my card|"
+        r"double charged|unrecognized charge|bank fee|stolen credit card|chargeback|paisa kat|"
+        r"paise kat|amount deduct|extra charge|unauthorized debit)\b",
         re.I
     ),
     "CUSTOMER_AGITATION_OR_LEGAL_THREAT": re.compile(
@@ -106,6 +107,16 @@ HIGH_RISK_PATTERNS = {
         re.I
     )
 }
+
+# Negation scope patterns to prevent false keyword triggers
+NEGATION_BILLING_PAT = re.compile(
+    r"\b(not|never|wasn't|was not|no|didn't|did not)\s+(really\s+)?(charged|charge|billed|debit|fee)(\s+(extra|again|twice|more|anything))?(\s+(for|on|about|in)\s*(my\s+|the\s+)?(prime|membership|subscription|renewal))?", 
+    re.I
+)
+NEGATION_REFUND_PAT = re.compile(
+    r"\b(do not|don't|not|never|didn't|did not)\s+(really\s+)?(want|wanted|need|needed|ask for|asked for|request|requested)\s+((a|an)\s+)?(refund|return(\s+label)?|replacement|exchange)\b", 
+    re.I
+)
 
 def resolve_intent_collision(detected_intents: List[str]) -> str:
     """
@@ -171,13 +182,33 @@ DOMAIN_INTENT_PATTERNS = {
         r"\b(kindle|fire stick|echo|alexa|app|website|code|voucher|coupon|promo|"
         r"error|crash|bug|tv app|frozen)\b",
         re.I
+    ),
+    "FEEDBACK_COMPLAINT_GENERAL": re.compile(
+        r"\b(thank\s*you|thanks|kudos|shoutout|great job|awesome service|terrible service|"
+        r"worst service|horrible|unacceptable service|disappointed|appreciate|good job|"
+        r"praise|complaint|feedback|poor customer care)\b",
+        re.I
     )
 }
 
 def detect_domain_intents(text: str) -> List[str]:
-    """Detect all candidate intents matching domain-specific linguistic patterns."""
+    """
+    Detect all candidate intents matching domain-specific linguistic patterns,
+    filtering out semantically negated keyword occurrences.
+    """
     detected = []
+    neg_billing = bool(NEGATION_BILLING_PAT.search(text))
+    neg_refund = bool(NEGATION_REFUND_PAT.search(text))
+
     for intent, pat in DOMAIN_INTENT_PATTERNS.items():
+        if intent == "BILLING_SUBSCRIPTION_PRIME" and neg_billing:
+            cleaned_text = NEGATION_BILLING_PAT.sub("", text)
+            if not pat.search(cleaned_text):
+                continue
+        if intent == "REFUND_RETURN_EXCHANGE" and neg_refund:
+            cleaned_text = NEGATION_REFUND_PAT.sub("", text)
+            if not pat.search(cleaned_text):
+                continue
         if pat.search(text):
             detected.append(intent)
     return detected

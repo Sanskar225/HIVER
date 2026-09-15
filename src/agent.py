@@ -16,8 +16,9 @@ import pickle
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, Callable
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
 
 from src.config import (
     INTENTS,
@@ -32,6 +33,8 @@ from src.taxonomy import (
     INTENT_METADATA,
     HIGH_RISK_PATTERNS,
     DOMAIN_INTENT_PATTERNS,
+    NEGATION_BILLING_PAT,
+    NEGATION_REFUND_PAT,
     resolve_intent_collision,
     evaluate_deterministic_risk,
     detect_domain_intents
@@ -41,6 +44,10 @@ from src.retriever import HistoricalRetriever
 logger = logging.getLogger(__name__)
 
 AGENT_MODEL_CACHE_PATH = ARTIFACTS_DIR / "agent_intent_model.pkl"
+
+# Custom Stop Words: preserve semantic negation tokens while pruning high-frequency preprocessor artifacts
+NEGATION_STOP_WORDS = {"not", "no", "never", "neither", "nor", "none", "cannot", "without", "nothing"}
+CUSTOM_STOP_WORDS = list((ENGLISH_STOP_WORDS - NEGATION_STOP_WORDS).union({"user", "link", "http", "https"}))
 
 # Module-level pre-compiled regex patterns for zero per-request compilation latency
 HUMAN_AGENT_REQUEST_PAT = re.compile(
@@ -228,30 +235,46 @@ class AmazonSupportAgent:
                 self.classifier = data["classifier"]
             return
 
-        logger.info("Training Calibrated TF-IDF + Logistic Regression Intent Classifier...")
-        sample_size = min(12000, len(self.retriever.df_kb))
-        sample_kb = self.retriever.df_kb.sample(sample_size, random_state=RANDOM_SEED)
+        logger.info("Training Calibrated Stratified TF-IDF + Logistic Regression Intent Classifier...")
+        class_buckets: Dict[str, List[str]] = {c: [] for c in DOMAIN_INTENT_PATTERNS}
+        target_per_class = 1200
         
-        texts = []
-        labels = []
-        for text in sample_kb["customer_text"]:
+        # Balanced stratified sampling across 55k KB without forced defaulting
+        for text in self.retriever.df_kb["customer_text"]:
             detected = detect_domain_intents(text)
-            primary = resolve_intent_collision(detected) if detected else "FEEDBACK_COMPLAINT_GENERAL"
-            texts.append(self.preprocess(text))
-            labels.append(primary)
+            if detected:
+                primary = resolve_intent_collision(detected)
+                if len(class_buckets[primary]) < target_per_class:
+                    clean_train = NEGATION_BILLING_PAT.sub("", text)
+                    clean_train = NEGATION_REFUND_PAT.sub("", clean_train)
+                    class_buckets[primary].append(self.preprocess(clean_train))
+
+        texts: List[str] = []
+        labels: List[str] = []
+        for intent_name, sample_texts in class_buckets.items():
+            texts.extend(sample_texts)
+            labels.extend([intent_name] * len(sample_texts))
+
+        logger.info(f"Assembled {len(texts)} balanced training instances across {len(class_buckets)} intents.")
 
         self.vectorizer = TfidfVectorizer(
-            max_features=30000,
+            max_features=8000,
             ngram_range=(1, 2),
-            stop_words="english",
+            stop_words=CUSTOM_STOP_WORDS,
             sublinear_tf=True
         )
         X = self.vectorizer.fit_transform(texts)
-        self.classifier = LogisticRegression(
+        
+        base_clf = LogisticRegression(
             max_iter=1000,
             random_state=RANDOM_SEED,
             class_weight="balanced",
             C=1.0
+        )
+        self.classifier = CalibratedClassifierCV(
+            estimator=base_clf,
+            method="sigmoid",
+            cv=5
         )
         self.classifier.fit(X, labels)
 
@@ -260,7 +283,7 @@ class AmazonSupportAgent:
                 "vectorizer": self.vectorizer,
                 "classifier": self.classifier
             }, f)
-        logger.info("Model trained and cached successfully.")
+        logger.info("Calibrated model trained and cached successfully.")
 
     def preprocess(self, text: str) -> str:
         """Normalizes user handles, urls, and redundant whitespace."""
@@ -272,15 +295,23 @@ class AmazonSupportAgent:
     def classify_intent(self, text: str) -> Tuple[str, float, List[str]]:
         """
         Calibrated Hybrid Intent Classification:
-        1. Computes statistical posterior probabilities P(intent | text) via Logistic Regression.
-        2. Detects explicit domain linguistic signals across all 8 intents.
-        3. Applies domain collision resolution when high-priority safety intents are present.
-        4. Outputs exact mathematical probability confidence (no arbitrary magic numbers).
+        1. Strips negated spans before vectorization to eliminate false keyword attraction.
+        2. Computes mathematically calibrated posterior probabilities P(intent | text) via CalibratedClassifierCV.
+        3. Detects domain-specific linguistic signals across all 8 intents.
+        4. Blends domain signals with ML probabilities:
+           - Safety priority: ACCOUNT_SECURITY_ACCESS always takes precedence when detected.
+           - Collision resolution: when multiple domain intents fire, select the candidate with highest calibrated ML posterior.
+           - Single domain match: verified domain candidate with posterior probability.
+           - Open domain: top ML predicted intent.
         """
         detected = detect_domain_intents(text)
         
-        # Statistical ML prediction
-        X_vec = self.vectorizer.transform([text])
+        # Strip negated spans to prevent false feature attraction in TF-IDF
+        text_for_ml = NEGATION_BILLING_PAT.sub("", text)
+        text_for_ml = NEGATION_REFUND_PAT.sub("", text_for_ml)
+        
+        # Statistical Calibrated ML prediction
+        X_vec = self.vectorizer.transform([text_for_ml])
         probs = self.classifier.predict_proba(X_vec)[0]
         classes = self.classifier.classes_
         prob_dict = {cls_name: float(p) for cls_name, p in zip(classes, probs)}
@@ -291,11 +322,14 @@ class AmazonSupportAgent:
         if not detected:
             primary_intent = ml_top_intent
             confidence = ml_confidence
+        elif "ACCOUNT_SECURITY_ACCESS" in detected:
+            primary_intent = "ACCOUNT_SECURITY_ACCESS"
+            confidence = prob_dict.get(primary_intent, ml_confidence)
         elif len(detected) == 1:
             primary_intent = detected[0]
             confidence = prob_dict.get(primary_intent, ml_confidence)
         else:
-            primary_intent = resolve_intent_collision(detected)
+            primary_intent = max(detected, key=lambda c: prob_dict.get(c, 0.0))
             confidence = prob_dict.get(primary_intent, ml_confidence)
 
         return primary_intent, round(confidence, 4), detected
@@ -306,6 +340,15 @@ class AmazonSupportAgent:
         Principle: "Maximize safe resolution, not automation rate."
         Safety guardrails CANNOT be overridden by probabilistic models.
         """
+        # 0. Calibrated Confidence Gating (OOD / Low Confidence Protection)
+        # Prevents low-confidence hallucinations or out-of-distribution gibberish from auto-handling
+        if confidence < 0.40:
+            return (
+                DECISION_ESCALATE,
+                "AMBIGUOUS_INQUIRY_NEEDS_CLARIFICATION",
+                f"Model calibrated confidence ({confidence:.2f}) below threshold (<0.40); routed to human specialist for clarification."
+            )
+
         # 1. Check Deterministic High-Risk Triggers
         is_risk, risk_cat, risk_reason = evaluate_deterministic_risk(customer_text)
         if is_risk:
@@ -337,7 +380,8 @@ class AmazonSupportAgent:
         from retrieved historical resolution cases (evidence[0]) and synthesizes a
         policy-compliant, privacy-safe response with verified link anchors.
         """
-        hist_reply = evidence[0]["support_reply"] if evidence else ""
+        top_sim = evidence[0].get("similarity", 0.0) if evidence else 0.0
+        hist_reply = evidence[0]["support_reply"] if (evidence and top_sim >= 0.12) else ""
         
         # 1. Grounding: Extract authentic historical agent signature tag (e.g. ^GR, ^LL, ^CS)
         agent_tag = "^CS"
@@ -358,7 +402,12 @@ class AmazonSupportAgent:
             neighbor_check = "We suggest checking around your property and with neighbors in the meantime. "
 
         if decision == DECISION_ESCALATE:
-            if escalation_cat == "LOST_OR_STOLEN_DELIVERY":
+            if escalation_cat == "AMBIGUOUS_INQUIRY_NEEDS_CLARIFICATION":
+                return (
+                    "We want to ensure you get the exact help you need. Could you please share a few more details "
+                    f"or your specific inquiry via direct message at [link] so a support specialist can assist you directly? {agent_tag}"
+                )
+            elif escalation_cat == "LOST_OR_STOLEN_DELIVERY":
                 return (
                     "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! "
                     f"{neighbor_check}For your privacy, please do not post your order details here. Please send us a direct message "
