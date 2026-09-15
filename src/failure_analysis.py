@@ -3,26 +3,30 @@ Phase 9: Failure Analysis Engine for @AmazonHelp.
 Identifies and categorizes the top failure modes across intent classification, triage safety, and reply grounding.
 """
 import json
-import pandas as pd
 from pathlib import Path
+from typing import Dict, Any, List
+import pandas as pd
 from src.config import GOLDEN_DATA_DIR, ARTIFACTS_DIR
 from src.agent import AmazonSupportAgent
+from src.quality_rubric import DeterministicQualityRubric
 
-def run_failure_analysis():
+def run_failure_analysis() -> Dict[str, Any]:
+    """
+    Evaluates all 200 golden evaluation cases to isolate edge-case failures.
+    Returns categorized failure modes and persists them to failure_analysis.json.
+    """
     golden_df = pd.read_json(GOLDEN_DATA_DIR / "golden_eval_set.json")
     agent = AmazonSupportAgent()
+    judge = DeterministicQualityRubric()
     
     print("[Failure Analysis] Evaluating all 200 cases to isolate edge failures...")
-    failures = {
+    failures: Dict[str, List[Dict[str, Any]]] = {
         "missed_escalations": [],
         "false_escalations": [],
         "multi_intent_borderline": [],
         "adversarial_edge_cases": [],
         "reply_quality_failures": []
     }
-    
-    from src.llm_judge import ReplyQualityJudge
-    judge = ReplyQualityJudge()
 
     for _, row in golden_df.iterrows():
         pred = agent.process(row["customer_text"])

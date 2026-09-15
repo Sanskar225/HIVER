@@ -16,7 +16,7 @@ from src.retriever import HistoricalRetriever
 from src.baselines import TrivialBaseline, SimpleBaseline
 from src.agent import AmazonSupportAgent
 from src.evaluator import evaluate_system
-from src.llm_judge import ReplyQualityRubric, evaluate_reply_batch
+from src.quality_rubric import DeterministicQualityRubric, evaluate_reply_batch
 
 def run_pipeline(reproduce: bool = True):
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -60,7 +60,7 @@ def run_pipeline(reproduce: bool = True):
     agent_eval = evaluate_system(agent_preds, golden_df, "Proposed Agent")
 
     print("\n[Step 5/5] Running Deterministic Multi-Criteria Reply Rubric...")
-    rubric = ReplyQualityRubric()
+    rubric = DeterministicQualityRubric()
     agent_pass_rate, _ = evaluate_reply_batch(rubric, agent_preds, golden_df)
     agent_eval["headline_metrics"]["grounded_reply_pass_rate"] = agent_pass_rate
 

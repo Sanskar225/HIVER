@@ -5,17 +5,20 @@ Provides high-speed lexical (TF-IDF + Cosine Similarity) retrieval.
 """
 import os
 import pickle
-import pandas as pd
+import logging
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from src.config import PROCESSED_DATA_DIR, ARTIFACTS_DIR
 
+logger = logging.getLogger(__name__)
+
 INDEX_CACHE_PATH = ARTIFACTS_DIR / "tfidf_retriever_index.pkl"
 
 class HistoricalRetriever:
-    def __init__(self, kb_path: Path = None, max_features: int = 50000):
+    def __init__(self, kb_path: Optional[Path] = None, max_features: int = 50000):
         self.kb_path = kb_path or (PROCESSED_DATA_DIR / "kb_corpus.parquet")
         self.max_features = max_features
         self.df_kb = None
@@ -23,21 +26,21 @@ class HistoricalRetriever:
         self.tfidf_matrix = None
         self._load_or_build_index()
 
-    def _load_or_build_index(self):
+    def _load_or_build_index(self) -> None:
         ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
         if INDEX_CACHE_PATH.exists():
-            print(f"[Retriever] Loading cached retrieval index from {INDEX_CACHE_PATH}...")
+            logger.info("Loading cached retrieval index from %s...", INDEX_CACHE_PATH)
             with open(INDEX_CACHE_PATH, "rb") as f:
                 data = pickle.load(f)
                 self.df_kb = data["df_kb"]
                 self.vectorizer = data["vectorizer"]
                 self.tfidf_matrix = data["tfidf_matrix"]
-            print(f"[Retriever] Loaded index with {len(self.df_kb):,} historical cases.")
+            logger.info("Loaded index with %s historical cases.", f"{len(self.df_kb):,}")
             return
 
-        print(f"[Retriever] Building TF-IDF index from {self.kb_path}...")
+        logger.info("Building TF-IDF index from %s...", self.kb_path)
         self.df_kb = pd.read_parquet(self.kb_path)
-        print(f"[Retriever] Loaded {len(self.df_kb):,} pairs. Vectorizing customer queries...")
+        logger.info("Loaded %s pairs. Vectorizing customer queries...", f"{len(self.df_kb):,}")
         
         self.vectorizer = TfidfVectorizer(
             ngram_range=(1, 2),
@@ -47,14 +50,14 @@ class HistoricalRetriever:
         )
         self.tfidf_matrix = self.vectorizer.fit_transform(self.df_kb["customer_text"].fillna(""))
         
-        print(f"[Retriever] Caching index to {INDEX_CACHE_PATH}...")
+        logger.info("Caching index to %s...", INDEX_CACHE_PATH)
         with open(INDEX_CACHE_PATH, "wb") as f:
             pickle.dump({
                 "df_kb": self.df_kb,
                 "vectorizer": self.vectorizer,
                 "tfidf_matrix": self.tfidf_matrix
             }, f)
-        print("[Retriever] Index built and cached successfully.")
+        logger.info("Index built and cached successfully.")
 
     def retrieve(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         """

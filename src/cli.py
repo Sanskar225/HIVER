@@ -7,7 +7,7 @@ import sys
 import json
 from src.agent import AmazonSupportAgent
 
-def main():
+def main() -> None:
     agent = AmazonSupportAgent()
     print("\n" + "="*80)
     print("  @AmazonHelp AI SUPPORT AGENT - INTERACTIVE TEST CONSOLE")
@@ -51,7 +51,7 @@ def main():
         except (KeyboardInterrupt, EOFError):
             break
 
-def run_query(agent: AmazonSupportAgent, query: str):
+def run_query(agent: AmazonSupportAgent, query: str) -> None:
     print("\n" + "-"*80)
     print(f"CUSTOMER MESSAGE: \"{query}\"")
     print("-"*80)

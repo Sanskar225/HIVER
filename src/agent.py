@@ -13,8 +13,9 @@ import os
 import re
 import json
 import pickle
+import logging
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Callable
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
@@ -37,7 +38,173 @@ from src.taxonomy import (
 )
 from src.retriever import HistoricalRetriever
 
+logger = logging.getLogger(__name__)
+
 AGENT_MODEL_CACHE_PATH = ARTIFACTS_DIR / "agent_intent_model.pkl"
+
+# Module-level pre-compiled regex patterns for zero per-request compilation latency
+HUMAN_AGENT_REQUEST_PAT = re.compile(
+    r"\b(human agent|talk to a (human|person|agent|representative)|"
+    r"speak with (a )?(human|person|agent|representative)|customer care executive|"
+    r"connect (me )?to (an? )?agent|transfer (me )?to (an? )?agent|real person|live agent|"
+    r"representative)\b",
+    re.I
+)
+
+DELIVERY_STOLEN_MISSING_PAT = re.compile(
+    r"\b(shows?|says?|marked|claims?)\s+(as\s+)?delivered\b.*\b(not\s+(here|received|arrived)|"
+    r"never\s+(left|received|got)|missing|nowhere|stole|theft|empty)\b|"
+    r"\bdelivered\b.*\b(not\s+received|nowhere\s+to\s+be\s+found|didn't\s+get|never got|wrong address)\b|"
+    r"\b(stole|stolen|theft|thief|porch pirate|box was empty|carrier stole|"
+    r"delivered to (the )?wrong address)\b",
+    re.I
+)
+
+DAMAGED_DELIVERY_ISSUE_PAT = re.compile(
+    r"\b(delivered|porch|doorstep|stole|stolen|theft|missing|empty box|never arrived)\b",
+    re.I
+)
+
+ORDER_CHANGE_DISPATCH_PAT = re.compile(
+    r"\b(delivered to (the )?wrong address|already delivered|already shipped|too late|on the way|in transit)\b",
+    re.I
+)
+
+WRONG_ADDRESS_CHECK_PAT = re.compile(r"wrong address", re.I)
+
+REFUND_DELAY_QUERY_PAT = re.compile(
+    r"\b(where is my refund|haven't received refund|still waiting for money|refund delay|"
+    r"mera refund|paisa wapas|refund nahi mila)\b",
+    re.I
+)
+
+CUSTOMER_HOSTILITY_PAT = re.compile(
+    r"\b(terrible|worst|disgusted|furious|lawyer|police|sue|unacceptable)\b",
+    re.I
+)
+
+AGENT_SIGNATURE_PAT = re.compile(r"\^([a-zA-Z]{2,3})$")
+NEIGHBOR_CHECK_PAT = re.compile(r"\b(neighbors?|household|around your (property|porch))\b", re.I)
+HUMAN_REP_INQUIRY_PAT = re.compile(r"\b(human|agent|person|representative)\b", re.I)
+
+ORDER_NUMBER_PAT = re.compile(
+    r"\b\d{3}-\d{7}-\d{7}\b|\b(order\s*(number|id|#)?\s*[:=]?\s*[A-Z0-9-]{8,})\b",
+    re.I
+)
+
+CREDENTIAL_SOLICIT_PAT = re.compile(
+    r"\b(please\s+(tweet|post|share|send|provide)\s+(us\s+)?(your\s+)?(credit card|cvv|password|full card number|card details))\b.*",
+    re.I
+)
+
+PII_REDACT_PAT = re.compile(r"\b(credit card|cvv|password|full card number)\b", re.I)
+AGENT_TAG_SUFFIX_PAT = re.compile(r"\^[a-zA-Z]{2,3}$")
+NORMALIZE_USER_PAT = re.compile(r"@\d+")
+NORMALIZE_URL_PAT = re.compile(r"https?://\S+")
+NORMALIZE_SPACES_PAT = re.compile(r"\s+")
+
+# Modular Policy Handlers for Triage Engine (Table-driven Strategy Pattern)
+def _triage_account_security(customer_text: str) -> Tuple[str, str, str]:
+    return (
+        DECISION_ESCALATE,
+        "ACCOUNT_SECURITY_RISK",
+        "Suspected account compromise or security lockout requires identity verification via private channel."
+    )
+
+def _triage_billing_subscription(customer_text: str) -> Tuple[str, str, str]:
+    return (
+        DECISION_ESCALATE,
+        "FINANCIAL_OR_BILLING_DISPUTE",
+        "Recurring subscription charge or unrecognized fee requires account billing review."
+    )
+
+def _triage_damaged_wrong_missing(customer_text: str) -> Tuple[str, str, str]:
+    if DAMAGED_DELIVERY_ISSUE_PAT.search(customer_text):
+        return (
+            DECISION_ESCALATE,
+            "LOST_OR_STOLEN_DELIVERY",
+            "Package reported missing, stolen, or delivered but unreceived; requires carrier investigation."
+        )
+    return (
+        DECISION_ESCALATE,
+        "DAMAGED_PHYSICAL_MERCHANDISE",
+        "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval."
+    )
+
+def _triage_delivery_status(customer_text: str) -> Tuple[str, str, str]:
+    if DELIVERY_STOLEN_MISSING_PAT.search(customer_text):
+        return (
+            DECISION_ESCALATE,
+            "LOST_OR_STOLEN_DELIVERY",
+            "Package marked delivered but not received by customer; requires carrier check and account-specific trace."
+        )
+    return (
+        DECISION_AUTO_HANDLE,
+        "NONE",
+        "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link."
+    )
+
+def _triage_order_change(customer_text: str) -> Tuple[str, str, str]:
+    if ORDER_CHANGE_DISPATCH_PAT.search(customer_text):
+        cat = (
+            "LOST_OR_STOLEN_DELIVERY" 
+            if WRONG_ADDRESS_CHECK_PAT.search(customer_text) 
+            else "MANUAL_REFUND_OR_RETURN_OVERRIDE"
+        )
+        return (
+            DECISION_ESCALATE,
+            cat,
+            "Package already dispatched or delivered to wrong address; requires carrier intercept or supervisor trace."
+        )
+    return (
+        DECISION_AUTO_HANDLE,
+        "NONE",
+        "Self-service order cancellation or address modification instructions can be handled via 'Your Orders' pre-dispatch."
+    )
+
+def _triage_refund_return(customer_text: str) -> Tuple[str, str, str]:
+    if REFUND_DELAY_QUERY_PAT.search(customer_text):
+        return (
+            DECISION_ESCALATE,
+            "MANUAL_REFUND_OR_RETURN_OVERRIDE",
+            "Refund disbursement inquiry requiring customer account financial lookup."
+        )
+    return (
+        DECISION_AUTO_HANDLE,
+        "NONE",
+        "Self-service return initiation and prepaid return label guidance can be auto-handled via 'Your Orders'."
+    )
+
+def _triage_technical_support(customer_text: str) -> Tuple[str, str, str]:
+    return (
+        DECISION_AUTO_HANDLE,
+        "NONE",
+        "First-line technical troubleshooting (rebooting device, clearing app cache) can be safely auto-handled."
+    )
+
+def _triage_feedback_complaint(customer_text: str) -> Tuple[str, str, str]:
+    if CUSTOMER_HOSTILITY_PAT.search(customer_text):
+        return (
+            DECISION_ESCALATE,
+            "CUSTOMER_AGITATION_OR_LEGAL_THREAT",
+            "Severe customer agitation or brand grievance requiring human supervisor attention."
+        )
+    return (
+        DECISION_AUTO_HANDLE,
+        "NONE",
+        "General customer feedback or commentary acknowledged with empathetic brand messaging."
+    )
+
+INTENT_POLICY_HANDLERS: Dict[str, Callable[[str], Tuple[str, str, str]]] = {
+    "ACCOUNT_SECURITY_ACCESS": _triage_account_security,
+    "BILLING_SUBSCRIPTION_PRIME": _triage_billing_subscription,
+    "DAMAGED_WRONG_MISSING": _triage_damaged_wrong_missing,
+    "DELIVERY_STATUS_DELAY": _triage_delivery_status,
+    "ORDER_CHANGE_CANCEL": _triage_order_change,
+    "REFUND_RETURN_EXCHANGE": _triage_refund_return,
+    "TECHNICAL_PRODUCT_SUPPORT": _triage_technical_support,
+    "FEEDBACK_COMPLAINT_GENERAL": _triage_feedback_complaint,
+}
 
 class AmazonSupportAgent:
     def __init__(
@@ -61,7 +228,7 @@ class AmazonSupportAgent:
                 self.classifier = data["classifier"]
             return
 
-        print("[AmazonSupportAgent] Training Calibrated TF-IDF + Logistic Regression Intent Classifier...")
+        logger.info("Training Calibrated TF-IDF + Logistic Regression Intent Classifier...")
         sample_size = min(12000, len(self.retriever.df_kb))
         sample_kb = self.retriever.df_kb.sample(sample_size, random_state=RANDOM_SEED)
         
@@ -93,13 +260,13 @@ class AmazonSupportAgent:
                 "vectorizer": self.vectorizer,
                 "classifier": self.classifier
             }, f)
-        print("[AmazonSupportAgent] Model trained and cached successfully.")
+        logger.info("Model trained and cached successfully.")
 
     def preprocess(self, text: str) -> str:
         """Normalizes user handles, urls, and redundant whitespace."""
-        text = re.sub(r"@\d+", "@User", text)
-        text = re.sub(r"https?://\S+", "[link]", text)
-        text = re.sub(r"\s+", " ", text).strip()
+        text = NORMALIZE_USER_PAT.sub("@User", text)
+        text = NORMALIZE_URL_PAT.sub("[link]", text)
+        text = NORMALIZE_SPACES_PAT.sub(" ", text).strip()
         return text
 
     def classify_intent(self, text: str) -> Tuple[str, float, List[str]]:
@@ -108,7 +275,7 @@ class AmazonSupportAgent:
         1. Computes statistical posterior probabilities P(intent | text) via Logistic Regression.
         2. Detects explicit domain linguistic signals across all 8 intents.
         3. Applies domain collision resolution when high-priority safety intents are present.
-        4. Outputs genuine mathematical probability confidence.
+        4. Outputs exact mathematical probability confidence (no arbitrary magic numbers).
         """
         detected = detect_domain_intents(text)
         
@@ -126,10 +293,10 @@ class AmazonSupportAgent:
             confidence = ml_confidence
         elif len(detected) == 1:
             primary_intent = detected[0]
-            confidence = max(ml_confidence, prob_dict.get(primary_intent, 0.85))
+            confidence = prob_dict.get(primary_intent, ml_confidence)
         else:
             primary_intent = resolve_intent_collision(detected)
-            confidence = max(prob_dict.get(primary_intent, 0.80), 0.82)
+            confidence = prob_dict.get(primary_intent, ml_confidence)
 
         return primary_intent, round(confidence, 4), detected
 
@@ -145,113 +312,16 @@ class AmazonSupportAgent:
             return DECISION_ESCALATE, risk_cat, risk_reason
 
         # 2. Check for Explicit Human Agent Requests (Hiver Core Support Ethos)
-        human_req_pat = re.compile(
-            r"\b(human agent|talk to a (human|person|agent|representative)|speak with (a )?(human|person|agent|representative)|customer care executive|connect (me )?to (an? )?agent|transfer (me )?to (an? )?agent|real person|live agent|representative)\b", 
-            re.I
-        )
-        if human_req_pat.search(customer_text):
+        if HUMAN_AGENT_REQUEST_PAT.search(customer_text):
             return (
                 DECISION_ESCALATE, 
                 "CUSTOMER_AGITATION_OR_LEGAL_THREAT", 
                 "Customer explicitly requested human support representative intervention."
             )
 
-        # 3. Intent-Specific Policy Rules
-        if intent == "ACCOUNT_SECURITY_ACCESS":
-            return (
-                DECISION_ESCALATE, 
-                "ACCOUNT_SECURITY_RISK", 
-                "Suspected account compromise or security lockout requires identity verification via private channel."
-            )
-
-        if intent == "BILLING_SUBSCRIPTION_PRIME":
-            return (
-                DECISION_ESCALATE, 
-                "FINANCIAL_OR_BILLING_DISPUTE", 
-                "Recurring subscription charge or unrecognized fee requires account billing review."
-            )
-
-        if intent == "DAMAGED_WRONG_MISSING":
-            if re.search(r"\b(delivered|porch|doorstep|stole|stolen|theft|missing|empty box|never arrived)\b", customer_text, re.I):
-                return (
-                    DECISION_ESCALATE, 
-                    "LOST_OR_STOLEN_DELIVERY", 
-                    "Package reported missing, stolen, or delivered but unreceived; requires carrier investigation."
-                )
-            return (
-                DECISION_ESCALATE, 
-                "DAMAGED_PHYSICAL_MERCHANDISE", 
-                "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval."
-            )
-
-        if intent == "DELIVERY_STATUS_DELAY":
-            # Guard against classifying routine ETA inquiries as stolen
-            stolen_missing_pat = re.compile(
-                r"\b(shows?|says?|marked|claims?)\s+(as\s+)?delivered\b.*\b(not\s+(here|received|arrived)|never\s+(left|received|got)|missing|nowhere|stole|theft|empty)\b|"
-                r"\bdelivered\b.*\b(not\s+received|nowhere\s+to\s+be\s+found|didn't\s+get|never got|wrong address)\b|"
-                r"\b(stole|stolen|theft|thief|porch pirate|box was empty|carrier stole|delivered to (the )?wrong address)\b", 
-                re.I
-            )
-            if stolen_missing_pat.search(customer_text):
-                return (
-                    DECISION_ESCALATE, 
-                    "LOST_OR_STOLEN_DELIVERY", 
-                    "Package marked delivered but not received by customer; requires carrier check and account-specific trace."
-                )
-            # Routine tracking ETA inquiry safely auto-handled
-            return (
-                DECISION_AUTO_HANDLE, 
-                "NONE", 
-                "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link."
-            )
-
-        if intent == "ORDER_CHANGE_CANCEL":
-            if re.search(r"\b(delivered to (the )?wrong address|already delivered|already shipped|too late|on the way|in transit)\b", customer_text, re.I):
-                cat = "LOST_OR_STOLEN_DELIVERY" if re.search(r"wrong address", customer_text, re.I) else "MANUAL_REFUND_OR_RETURN_OVERRIDE"
-                return (
-                    DECISION_ESCALATE, 
-                    cat, 
-                    "Package already dispatched or delivered to wrong address; requires carrier intercept or supervisor trace."
-                )
-            return (
-                DECISION_AUTO_HANDLE, 
-                "NONE", 
-                "Self-service order cancellation or address modification instructions can be handled via 'Your Orders' pre-dispatch."
-            )
-
-        if intent == "REFUND_RETURN_EXCHANGE":
-            if re.search(r"\b(where is my refund|haven't received refund|still waiting for money|refund delay|mera refund|paisa wapas|refund nahi mila)\b", customer_text, re.I):
-                return (
-                    DECISION_ESCALATE, 
-                    "MANUAL_REFUND_OR_RETURN_OVERRIDE", 
-                    "Refund disbursement inquiry requiring customer account financial lookup."
-                )
-            return (
-                DECISION_AUTO_HANDLE, 
-                "NONE", 
-                "Self-service return initiation and prepaid return label guidance can be auto-handled via 'Your Orders'."
-            )
-
-        if intent == "TECHNICAL_PRODUCT_SUPPORT":
-            return (
-                DECISION_AUTO_HANDLE, 
-                "NONE", 
-                "First-line technical troubleshooting (rebooting device, clearing app cache) can be safely auto-handled."
-            )
-
-        # FEEDBACK_COMPLAINT_GENERAL
-        if re.search(r"\b(terrible|worst|disgusted|furious|lawyer|police|sue|unacceptable)\b", customer_text, re.I):
-            return (
-                DECISION_ESCALATE, 
-                "CUSTOMER_AGITATION_OR_LEGAL_THREAT", 
-                "Severe customer agitation or brand grievance requiring human supervisor attention."
-            )
-
-        return (
-            DECISION_AUTO_HANDLE, 
-            "NONE", 
-            "General customer feedback or commentary acknowledged with empathetic brand messaging."
-        )
+        # 3. Intent-Specific Policy Rules dispatched via strategy table
+        handler = INTENT_POLICY_HANDLERS.get(intent, _triage_feedback_complaint)
+        return handler(customer_text)
 
     def generate_grounded_reply(
         self, 
@@ -272,7 +342,7 @@ class AmazonSupportAgent:
         # 1. Grounding: Extract authentic historical agent signature tag (e.g. ^GR, ^LL, ^CS)
         agent_tag = "^CS"
         if hist_reply:
-            tag_match = re.search(r"\^([a-zA-Z]{2,3})$", hist_reply.strip())
+            tag_match = AGENT_SIGNATURE_PAT.search(hist_reply.strip())
             if tag_match:
                 agent_tag = f"^{tag_match.group(1)}"
 
@@ -284,7 +354,7 @@ class AmazonSupportAgent:
                 break
 
         neighbor_check = ""
-        if re.search(r"\b(neighbors?|household|around your (property|porch))\b", hist_reply, re.I):
+        if NEIGHBOR_CHECK_PAT.search(hist_reply):
             neighbor_check = "We suggest checking around your property and with neighbors in the meantime. "
 
         if decision == DECISION_ESCALATE:
@@ -312,7 +382,7 @@ class AmazonSupportAgent:
                     f"Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. {agent_tag}"
                 )
             else: # Customer agitation, legal threat, or explicit human agent request
-                if re.search(r"\b(human|agent|person|representative)\b", customer_text, re.I):
+                if HUMAN_REP_INQUIRY_PAT.search(customer_text):
                     return (
                         "I understand you'd like to connect directly with a representative. We are here to help! "
                         f"Please connect with us via direct message at [link] so a specialist can review your account and assist you in real time. {agent_tag}"
@@ -356,14 +426,9 @@ class AmazonSupportAgent:
         - Guarantees valid sanitized link placeholders.
         - Appends brand sign-off if omitted.
         """
-        cleaned = re.sub(
-            r"\b(please\s+(tweet|post|share|send|provide)\s+(us\s+)?(your\s+)?(credit card|cvv|password|full card number|card details))\b.*", 
-            "please connect privately via our secure link [link]", 
-            reply, 
-            flags=re.I
-        )
-        cleaned = re.sub(r"\b(credit card|cvv|password|full card number)\b", "[redacted]", cleaned, flags=re.I)
-        if not re.search(r"\^[a-zA-Z]{2,3}$", cleaned.strip()):
+        cleaned = CREDENTIAL_SOLICIT_PAT.sub("please connect privately via our secure link [link]", reply)
+        cleaned = PII_REDACT_PAT.sub("[redacted]", cleaned)
+        if not AGENT_TAG_SUFFIX_PAT.search(cleaned.strip()):
             cleaned = cleaned.strip() + " ^CS"
         return cleaned
 
@@ -379,17 +444,18 @@ class AmazonSupportAgent:
         cleaned_text = self.preprocess(customer_text)
 
         # Multi-turn context resolution
-        is_order_number = bool(re.search(r"\b\d{3}-\d{7}-\d{7}\b|\b(order\s*(number|id|#)?\s*[:=]?\s*[A-Z0-9-]{8,})\b", customer_text, re.I))
+        is_order_number = bool(ORDER_NUMBER_PAT.search(customer_text))
         if conversation_history and len(conversation_history) > 0:
             last_turn = conversation_history[-1]
             last_agent_text = last_turn.get("agent_reply", "")
             
             # Follow-up: customer provides requested order number
             if is_order_number and ("order number" in last_agent_text.lower() or "direct message" in last_agent_text.lower()):
+                prior_confidence = float(last_turn.get("intent_confidence", 0.95))
                 return {
                     "session_id": session_id,
                     "intent": last_turn.get("intent", "DELIVERY_STATUS_DELAY"),
-                    "intent_confidence": 0.98,
+                    "intent_confidence": round(prior_confidence, 4),
                     "decision": DECISION_ESCALATE,
                     "escalation_category": last_turn.get("escalation_category", "ACCOUNT_SPECIFIC_PII_REQUIRED"),
                     "reason": "Multi-turn context: customer provided order number for active escalation inquiry.",

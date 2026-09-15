@@ -9,11 +9,12 @@ Computes:
 """
 import re
 import json
+import collections
+from pathlib import Path
+from typing import Dict, Any, List, Tuple
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
 from sklearn.metrics import (
     accuracy_score, 
     precision_recall_fscore_support, 
@@ -31,8 +32,7 @@ def compute_ngram_overlap(hyp_tokens: List[str], ref_tokens: List[str], n: int) 
     total = sum(hyp_ngrams.values())
     return intersection / total if total > 0 else 0.0
 
-def collections_ngrams(tokens: List[str], n: int):
-    import collections
+def collections_ngrams(tokens: List[str], n: int) -> collections.Counter:
     return collections.Counter([tuple(tokens[i:i+n]) for i in range(len(tokens)-n+1)])
 
 def compute_rouge_l(hyp_tokens: List[str], ref_tokens: List[str]) -> float:
@@ -53,7 +53,7 @@ def compute_rouge_l(hyp_tokens: List[str], ref_tokens: List[str]) -> float:
         return 0.0
     return (2 * prec * rec) / (prec + rec)
 
-def plot_confusion_matrix(cm: np.ndarray, labels: List[str], title: str, save_path: Path):
+def plot_confusion_matrix(cm: np.ndarray, labels: List[str], title: str, save_path: Path) -> None:
     plt.figure(figsize=(10, 8))
     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
     plt.title(title, fontsize=14, pad=15)

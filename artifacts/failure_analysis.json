@@ -1,6 +1,62 @@
 {
   "missed_escalations": [
     {
+      "id": "GOLDEN-002",
+      "tier": "normal",
+      "customer_text": "I was expecting a package to arrive yesterday &amp; it hasn't. Then it shows update saying it would arrive today by 8pm--it's now after 8pm and the items have not been delivered! They arrived yesterday morning to a city less than 1 hour away--when will my package arrive?!",
+      "gold_intent": "DELIVERY_STATUS_DELAY",
+      "pred_intent": "DELIVERY_STATUS_DELAY",
+      "gold_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^MB",
+      "historical_reply": "Oh no! I'm so sorry your package hasn't arrived yet. Can you tell us who the carrier is? If you're unsure, you can check here: [link] ^AY",
+      "judge_overall": 5.0
+    },
+    {
+      "id": "GOLDEN-004",
+      "tier": "normal",
+      "customer_text": "@AmazonHelp what do I do when my package is showing as being delivered and claiming to have been handed directly to me yesterday yet I have received nothing?? \ud83d\ude29",
+      "gold_intent": "DELIVERY_STATUS_DELAY",
+      "pred_intent": "DELIVERY_STATUS_DELAY",
+      "gold_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^VS",
+      "historical_reply": "I'm sorry to hear you haven't been able to locate your order, check out our help page on how to locate your parcel: [link] ^KI",
+      "judge_overall": 5.0
+    },
+    {
+      "id": "GOLDEN-011",
+      "tier": "normal",
+      "customer_text": "says my package was delivered. It most definitely was not! Pissed off. Tis\u2019 the season for everything to suddenly disappear. Not a happy customer.",
+      "gold_intent": "DELIVERY_STATUS_DELAY",
+      "pred_intent": "DELIVERY_STATUS_DELAY",
+      "gold_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^SY",
+      "historical_reply": "I'm sorry you haven't received your order yet! We recommend taking a look over these tips to help locate the order: [link] If you still can't find it, please let us know. ^MB",
+      "judge_overall": 5.0
+    },
+    {
+      "id": "GOLDEN-017",
+      "tier": "normal",
+      "customer_text": "Why you guys update tracking status as \"delivered\" without actually delivering the product? Tracking #:511367948985",
+      "gold_intent": "DELIVERY_STATUS_DELAY",
+      "pred_intent": "DELIVERY_STATUS_DELAY",
+      "gold_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^RW",
+      "historical_reply": "Please don't provide your order details, we consider it personal information. Our Twitter page is visible to public. 2/2 ^MK",
+      "judge_overall": 5.0
+    },
+    {
       "id": "GOLDEN-041",
       "tier": "normal",
       "customer_text": "why hasn't @User give me my refund lmaoooooo",
@@ -35,6 +91,20 @@
         "overall_score": 4.05,
         "passed": false
       }
+    },
+    {
+      "id": "GOLDEN-160",
+      "tier": "difficult",
+      "customer_text": "I have ordered this product on 14th Oct 2018. In the morning of 19th Oct 2017 , around 8:30 am when I open the Amazon app, it showing me that order delivered and signed by Nihal yadav ( he is my father). We are shocked that no one comes to deliver the product how's it?",
+      "gold_intent": "DELIVERY_STATUS_DELAY",
+      "pred_intent": "DELIVERY_STATUS_DELAY",
+      "gold_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^JC",
+      "historical_reply": "I'm sorry you've not received your order. This could be due to the incorrect tracking update. (1/2)^SF",
+      "judge_overall": 5.0
     },
     {
       "id": "GOLDEN-181",
@@ -97,20 +167,6 @@
   ],
   "false_escalations": [
     {
-      "id": "GOLDEN-008",
-      "tier": "normal",
-      "customer_text": "Shoutout to sherry from @AmazonHelp for helping me with me lost package all my family\u2019s Christmas presents are now safe and sound.",
-      "gold_intent": "FEEDBACK_COMPLAINT_GENERAL",
-      "pred_intent": "DELIVERY_STATUS_DELAY",
-      "gold_triage": "AUTO_HANDLE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Customer giving praise/shoutout for previously resolved issue; auto-handle with courteous brand acknowledgment.",
-      "pred_reason": "Package marked delivered but not received by customer; requires carrier check and account-specific trace.",
-      "agent_reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^MT",
-      "historical_reply": "Happy to hear this! Thanks for letting us know. Hope you have a great rest of your night! \ud83d\ude0a ^LI",
-      "judge_overall": 5.0
-    },
-    {
       "id": "GOLDEN-134",
       "tier": "normal",
       "customer_text": "In the middle of one of the worst customer service experiences ever! @User used to be the best. Now lost packages and reps who do not have English language skills enough for a conversation. @AmazonHelp",
@@ -143,7 +199,7 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
+      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval.",
       "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^JE",
       "historical_reply": "I'm so sorry to see your order arrived like this, Noel! That's definitely not the service we strive to provide. We'd like to take a look into this and available options with you directly. At your convenience, please reach out to us here: [link] ^TH",
       "judge_overall": 5.0
@@ -157,7 +213,7 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
+      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval.",
       "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^AC",
       "historical_reply": "We've responded to your query here: [link] ^HA",
       "judge_overall": 5.0
@@ -297,7 +353,7 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
+      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval.",
       "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^DG",
       "historical_reply": "I'm really sorry to hear this! We can't access your acct via Twitter, so pls reach us via phone: [link] ^KN",
       "judge_overall": 5.0
@@ -407,10 +463,10 @@
       "gold_intent": "DELIVERY_STATUS_DELAY",
       "pred_intent": "DELIVERY_STATUS_DELAY",
       "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
+      "pred_triage": "AUTO_HANDLE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DELIVERY_STATUS_DELAY. Triage: ESCALATE.",
-      "pred_reason": "Package marked delivered but not received by customer; requires carrier check and account-specific trace.",
-      "agent_reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^JC",
+      "pred_reason": "General delivery status and tracking ETA guidance can be provided via self-service 'Your Orders' tracking link.",
+      "agent_reply": "Sorry to hear your delivery is running behind schedule! You can track real-time courier updates and your latest delivery estimate directly from your account by visiting Your Orders: [link]. Let us know if we can assist further! ^JC",
       "historical_reply": "I'm sorry you've not received your order. This could be due to the incorrect tracking update. (1/2)^SF",
       "judge_overall": 5.0
     },
@@ -465,7 +521,7 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
+      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires replacement/refund approval.",
       "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^MM",
       "historical_reply": "Did the seller provide a new tracking number for you ? ^DD",
       "judge_overall": 5.0
@@ -605,10 +661,18 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: BILLING_SUBSCRIPTION_PRIME. Triage: ESCALATE.",
-      "pred_reason": "Recurring subscription charge or unrecognized fee requires account billing review.",
-      "agent_reply": "I understand your concern regarding unexpected charges on your statement. Because this involves private billing and card details, please send us a DM or contact us via our secure page: [link] so an account specialist can safely review the transactions for you. ^HD",
+      "pred_reason": "Deterministic safety rule triggered: customer agitation or legal threat detected in customer message.",
+      "agent_reply": "I'm very sorry for the frustrating experience you've had. This is definitely not the standard we aim to deliver. Please connect with us via direct message at [link] so we can have a representative review your account history and resolve this for you. ^HD",
       "historical_reply": "Sorry about the unpleasant experience. Kindly share your details here:[link] and we'll fix this for you. ^GD",
-      "judge_overall": 5.0
+      "judge_overall": 4.05,
+      "judge_details": {
+        "groundedness": 3,
+        "tone": 5,
+        "actionability": 4,
+        "pii_safety": 5,
+        "overall_score": 4.05,
+        "passed": false
+      }
     },
     {
       "id": "GOLDEN-179",
@@ -619,8 +683,8 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
-      "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^ZW",
+      "pred_reason": "Package reported missing, stolen, or delivered but unreceived; requires carrier investigation.",
+      "agent_reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^ZW",
       "historical_reply": "Sorry for the back and forth John. Was the issue resolved after you were transferred? ^NV",
       "judge_overall": 5.0
     },
@@ -663,8 +727,8 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
-      "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^BA",
+      "pred_reason": "Package reported missing, stolen, or delivered but unreceived; requires carrier investigation.",
+      "agent_reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^BA",
       "historical_reply": "I'm sorry for the frustration. We definitely don't want to let you down! Have you contacted us about the multiple delivery issues: [link] ^KB",
       "judge_overall": 5.0
     },
@@ -764,17 +828,9 @@
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Long-term blocked or compromised account requires manual identity verification by account specialist.",
       "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^JJ",
+      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your [redacted] or payment details publicly. We strongly advise resetting your [redacted] immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^JJ",
       "historical_reply": "I'm so sorry about this! Have you received any communication from our Account Specialist regarding this issue? ^JY",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
+      "judge_overall": 4.8
     },
     {
       "id": "GOLDEN-189",
@@ -927,8 +983,8 @@
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: DAMAGED_WRONG_MISSING. Triage: ESCALATE.",
-      "pred_reason": "Customer reports damaged merchandise or incorrect item; requires carrier investigation and replacement/refund approval.",
-      "agent_reply": "I'm truly sorry your order arrived damaged! We want to make this right immediately. Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. ^JE",
+      "pred_reason": "Package reported missing, stolen, or delivered but unreceived; requires carrier investigation.",
+      "agent_reply": "I'm so sorry to hear your package hasn't turned up even though it's marked as delivered! For your privacy, please do not post your order details here. Please send us a direct message with your order number and email address through our secure link [link] so we can investigate with the carrier right away. ^JE",
       "historical_reply": "I'm very sorry to hear that your parcel hasn't been located! Have you tried out these steps: [link] Let us know, Matt! ^AB",
       "judge_overall": 5.0
     },
@@ -942,17 +998,9 @@
       "pred_triage": "ESCALATE",
       "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
       "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^LR",
+      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your [redacted] or payment details publicly. We strongly advise resetting your [redacted] immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^LR",
       "historical_reply": "Appreciate your understanding. Also, please don't provide your order details, as we consider it to be personal information. Our Twitter page is public.\u200b 2/2 ^NK",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
+      "judge_overall": 4.8
     },
     {
       "id": "GOLDEN-200",
@@ -970,380 +1018,6 @@
     }
   ],
   "reply_quality_failures": [
-    {
-      "id": "GOLDEN-082",
-      "tier": "normal",
-      "customer_text": "I can\u2019t access my Amazon account and I\u2019ve changed the password 5 times. Can you please help?",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^KH",
-      "historical_reply": "I'm sorry you can't access your account! Have you received any e-mails from us about your account? ^TR",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-083",
-      "tier": "normal",
-      "customer_text": "I've been fighting with your support for over two months. Someone hacked my account and placed a $4,000 order for gift cards. I told my CC company to file a chargeback and now you've locked my account! I won't pay for a $4,000 fraudulent order! Amazon doesn't care.",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Long-term blocked or compromised account requires manual identity verification by account specialist.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^AL",
-      "historical_reply": "I can confirm a member of our team is taking a look into this for you. Please keep an eye on your e-mail for a response from us. ^KP",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-084",
-      "tier": "normal",
-      "customer_text": "I think it's a fraud in the name of amazon....what say? #amazonindia",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^KA",
-      "historical_reply": "I'm unable to comprehend the issue you're facing Could you elaborate the issue, so that we can assist you accordingly. ^PJ",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-085",
-      "tier": "normal",
-      "customer_text": "-two weeks time.I AM NEVER GOING TO BUY FROM AMAZON AGAIN AND GOING TO RECOMMEND OTHERS TO NOT NOT BUY FROM THIS FRAUD. [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^NK",
-      "historical_reply": "Manufacturers, Distributors or Sellers. Kindly refer here: [link] for more information. 2/2 ^AP",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-086",
-      "tier": "normal",
-      "customer_text": "i can't sign into my account after changing the password help !",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^CO",
-      "historical_reply": "I'm sorry to hear that you're having trouble signing in to your account! Please reach out to us here: [link] ^AC",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-087",
-      "tier": "normal",
-      "customer_text": "The registration and subsequent login process is super vague and confusing.",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^JS",
-      "historical_reply": "Hi Brendan, are you having an issue logging into your account? ^JJ",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-088",
-      "tier": "normal",
-      "customer_text": "Didn't realise anything was fishy until it asked me to confirm my mum's maiden name and bank details. @User customers beware #scam [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^PK",
-      "historical_reply": "Yes. That doesn't look like something we'd send. Thank you for highlighting Siobhan. Here's more information: http:[link] ^PK",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-089",
-      "tier": "normal",
-      "customer_text": "Hi, Im signed in on Amazon. When I check my orders,I have to type password in again. It then says my email address doesnt exist?",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^LB",
-      "historical_reply": "Hi Luke- Which site is your account with? Have you received any emails from us recently regarding your account? ^NV",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-090",
-      "tier": "normal",
-      "customer_text": "my account was hacked by a new email and now I\ufe0f can\u2019t log in to get to my info. SOS [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Long-term blocked or compromised account requires manual identity verification by account specialist.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^TR",
-      "historical_reply": "Oh no! Let's get this reported. You should have been sent an email that included the new email address. Please contact us directly with that information by calling the phone number provided when you choose an issue here: [link] ^JF",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-091",
-      "tier": "normal",
-      "customer_text": "calls itself 'Earths most customer-centric company' \ud83d\ude10 The service I have rec'd since being hacked on mon has been shocking!",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^KK",
-      "historical_reply": "Hi, sorry to hear that. Have you called us on the number found via this link: [link] to report it? ^JJ",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-092",
-      "tier": "normal",
-      "customer_text": "@AmazonHelp @User has done fraud with me.",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^HR",
-      "historical_reply": "My apologies for the trouble, Himanshu. Kindly revert to the email sent for further communication on this. ^KS",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-093",
-      "tier": "normal",
-      "customer_text": "hi I can't seem to login in to my amazin know NFL account to upgrade CC details, it doesn't recognise my email. Can you help?",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^AG",
-      "historical_reply": "Absolutely! I'm sorry for the account trouble! To clarify, which domain do you have your account with? (.com, .co.uk, etc) ^TK",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-094",
-      "tier": "normal",
-      "customer_text": "amazon is no1 fraud company. lazy employees i'm seller last month register my case still no solution of them [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^RW",
-      "historical_reply": "I'm sorry to know that your issue hasn't been resolved even after repeated contacts. We'd like to have this checked, kindly drop in your details here: [link]",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-095",
-      "tier": "normal",
-      "customer_text": "this looks like a scam? Can you verify? [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^ZW",
-      "historical_reply": "I'm sorry for any anxiety this caused, Christine! Are you able to locate this e-mail here: [link] ^SG",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-096",
-      "tier": "normal",
-      "customer_text": "is 877-252-2701 \"Amazon Logistics\" a legimate caller from Amazon or is this a scam?",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^KS",
-      "historical_reply": "If you receive a suspicious call, or encounter any other uses of the [link] name that you think may be fraudulent, please don't hesitate to report it here: [link] 2/2 ^GG",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-097",
-      "tier": "normal",
-      "customer_text": "@User @User Is there any special arrangement btw Amex &amp; Amazon? Amazon, didn't ask for any OTP or CVV number?",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^NS",
-      "historical_reply": "eliminating the need to enter a CVV number or a 3D secure password. (3/3)^YP",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-098",
-      "tier": "normal",
-      "customer_text": "worst experience with Amazon,it's been 11 days fraud transaction happen on my card but no proper response from @AmazonHelp",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^CB",
-      "historical_reply": "We've responded to your via DM, please check and revert. ^HN",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
     {
       "id": "GOLDEN-116",
       "tier": "normal",
@@ -1400,28 +1074,6 @@
       "pred_reason": "General customer feedback or commentary acknowledged with empathetic brand messaging.",
       "agent_reply": "Thank you for sharing your feedback with us. We appreciate hearing from our customers as it helps us improve our service. If there is an active order you need assistance with, please let us know! ^ME",
       "historical_reply": "When an account is put on hold, it would be followed by an email from our specialist team. Kindly check and revert 1/2^EM",
-      "judge_overall": 4.05,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 2,
-        "pii_safety": 5,
-        "overall_score": 4.05,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-119",
-      "tier": "normal",
-      "customer_text": "This is happening far too often. I was in today and the driver did not ring the door bell or knock on the door. I saw him driving off. [link]",
-      "gold_intent": "FEEDBACK_COMPLAINT_GENERAL",
-      "pred_intent": "FEEDBACK_COMPLAINT_GENERAL",
-      "gold_triage": "AUTO_HANDLE",
-      "pred_triage": "AUTO_HANDLE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: FEEDBACK_COMPLAINT_GENERAL. Triage: AUTO_HANDLE.",
-      "pred_reason": "General customer feedback or commentary acknowledged with empathetic brand messaging.",
-      "agent_reply": "Thank you for sharing your feedback with us. We appreciate hearing from our customers as it helps us improve our service. If there is an active order you need assistance with, please let us know! ^BH",
-      "historical_reply": "I'm sorry to hear this. Please reach out to us by phone or chat so we can look into this with you: [link] ^GR",
       "judge_overall": 4.05,
       "judge_details": {
         "groundedness": 5,
@@ -1851,24 +1503,24 @@
       }
     },
     {
-      "id": "GOLDEN-172",
+      "id": "GOLDEN-178",
       "tier": "difficult",
-      "customer_text": "So @User has decided my cell number belongs to someone else. They keep texting me security codes. I told them it was MY number &amp; call me! I\u2019ll prove it. I\u2019LL ANSWER THE PHONE!They said no! @User seriously? So I get texts at MIDNIGHT with security codes &amp; you won\u2019t fix it??",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
+      "customer_text": "Your customer support is so poor. Customer care executive is unaware of the rules and conditions of your website. We had to tell them what is written in @User . Being a prime member I am so frustrated with the service.",
+      "gold_intent": "BILLING_SUBSCRIPTION_PRIME",
+      "pred_intent": "BILLING_SUBSCRIPTION_PRIME",
       "gold_triage": "ESCALATE",
       "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^NM",
-      "historical_reply": "I'm so sorry your phone number is tied to another Amazon account! We'd like to look into this directly. Please give us some additional information here: [link] ^BE",
-      "judge_overall": 4.0,
+      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: BILLING_SUBSCRIPTION_PRIME. Triage: ESCALATE.",
+      "pred_reason": "Deterministic safety rule triggered: customer agitation or legal threat detected in customer message.",
+      "agent_reply": "I'm very sorry for the frustrating experience you've had. This is definitely not the standard we aim to deliver. Please connect with us via direct message at [link] so we can have a representative review your account history and resolve this for you. ^HD",
+      "historical_reply": "Sorry about the unpleasant experience. Kindly share your details here:[link] and we'll fix this for you. ^GD",
+      "judge_overall": 4.05,
       "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
+        "groundedness": 3,
+        "tone": 5,
+        "actionability": 4,
+        "pii_safety": 5,
+        "overall_score": 4.05,
         "passed": false
       }
     },
@@ -1917,28 +1569,6 @@
       }
     },
     {
-      "id": "GOLDEN-188",
-      "tier": "adversarial",
-      "customer_text": "You have locked me out of my account for 5hrs for placing an order. I verified my credit card, used email security code and yet you still locked my account. What shocking service, truly incompetent and pathetic. Totally unacceptable to treat yours customers like this.",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Long-term blocked or compromised account requires manual identity verification by account specialist.",
-      "pred_reason": "Suspected account compromise or security lockout requires identity verification via private channel.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^JJ",
-      "historical_reply": "I'm so sorry about this! Have you received any communication from our Account Specialist regarding this issue? ^JY",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
-        "passed": false
-      }
-    },
-    {
       "id": "GOLDEN-189",
       "tier": "adversarial",
       "customer_text": "Can someone ask @AmazonHelp where my package is from 2 weeks ago! You know the same package they expect me to file a police report for lol [link]",
@@ -1979,28 +1609,6 @@
         "actionability": 2,
         "pii_safety": 5,
         "overall_score": 4.05,
-        "passed": false
-      }
-    },
-    {
-      "id": "GOLDEN-199",
-      "tier": "adversarial",
-      "customer_text": "@User Hi, I have ordered a BPL TV from amazon at a listed price for a seller but when i contact the customer care for product delivery information, they informed me that it was a pricing error. I have given a tracking id too and now this happens#amazon#fraud [link]",
-      "gold_intent": "ACCOUNT_SECURITY_ACCESS",
-      "pred_intent": "ACCOUNT_SECURITY_ACCESS",
-      "gold_triage": "ESCALATE",
-      "pred_triage": "ESCALATE",
-      "gold_reason": "Human Audit: Verified under Hiver @AmazonHelp guidelines. Intent: ACCOUNT_SECURITY_ACCESS. Triage: ESCALATE.",
-      "pred_reason": "Deterministic safety rule triggered: account security risk detected in customer message.",
-      "agent_reply": "Thank you for bringing this to our attention. We take account security very seriously. Please do not share your password or payment details publicly. We strongly advise resetting your password immediately, and please reach out to our account security specialists directly via our secure portal: [link]. ^LR",
-      "historical_reply": "Appreciate your understanding. Also, please don't provide your order details, as we consider it to be personal information. Our Twitter page is public.\u200b 2/2 ^NK",
-      "judge_overall": 4.0,
-      "judge_details": {
-        "groundedness": 5,
-        "tone": 4,
-        "actionability": 5,
-        "pii_safety": 1,
-        "overall_score": 4.0,
         "passed": false
       }
     }

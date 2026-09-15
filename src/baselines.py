@@ -5,15 +5,24 @@ Phase 4: Baselines for @AmazonHelp Evaluation.
 """
 import re
 import pickle
-import pandas as pd
+import logging
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.config import INTENTS, ARTIFACTS_DIR, RANDOM_SEED
+from src.taxonomy import detect_domain_intents, resolve_intent_collision
 from src.retriever import HistoricalRetriever
 
+logger = logging.getLogger(__name__)
+
 MODEL_CACHE_PATH = ARTIFACTS_DIR / "simple_baseline_model.pkl"
+
+SIMPLE_ESCALATE_PAT = re.compile(
+    r"\b(stolen|delivered|refund|cancel|hacked|fraud|charge|broken|damaged|lawyer|police|sue|unauthorized)\b", 
+    re.I
+)
 
 class TrivialBaseline:
     """
@@ -43,32 +52,30 @@ class SimpleBaseline:
     - Triage: Regex-based keyword heuristic.
     - Reply: Top-1 raw historical brand reply retrieved via 1-NN search.
     """
-    def __init__(self, retriever: HistoricalRetriever = None):
+    def __init__(self, retriever: Optional[HistoricalRetriever] = None):
         self.retriever = retriever or HistoricalRetriever()
         self.vectorizer = None
         self.classifier = None
         self._train_or_load_classifier()
 
-    def _train_or_load_classifier(self):
+    def _train_or_load_classifier(self) -> None:
         ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
         if MODEL_CACHE_PATH.exists():
-            print(f"[SimpleBaseline] Loading cached classifier from {MODEL_CACHE_PATH}...")
+            logger.info("Loading cached classifier from %s...", MODEL_CACHE_PATH)
             with open(MODEL_CACHE_PATH, "rb") as f:
                 data = pickle.load(f)
                 self.vectorizer = data["vectorizer"]
                 self.classifier = data["classifier"]
             return
 
-        print("[SimpleBaseline] Training TF-IDF + Logistic Regression Intent Classifier...")
-        # To train a clean classifier, we use the taxonomy regexes on 8,000 KB samples to create pseudo-labels
-        from src.build_golden_set import classify_candidate
-        
+        logger.info("Training TF-IDF + Logistic Regression Intent Classifier for SimpleBaseline...")
         sample_kb = self.retriever.df_kb.sample(min(10000, len(self.retriever.df_kb)), random_state=RANDOM_SEED)
         texts = []
         labels = []
         
         for text in sample_kb["customer_text"]:
-            prim_intent, _ = classify_candidate(text)
+            detected = detect_domain_intents(text)
+            prim_intent = resolve_intent_collision(detected) if detected else "FEEDBACK_COMPLAINT_GENERAL"
             texts.append(text)
             labels.append(prim_intent)
             
@@ -82,7 +89,7 @@ class SimpleBaseline:
                 "vectorizer": self.vectorizer,
                 "classifier": self.classifier
             }, f)
-        print("[SimpleBaseline] Classifier trained and cached.")
+        logger.info("SimpleBaseline classifier trained and cached.")
 
     def predict(self, customer_text: str) -> Dict[str, Any]:
         # 1. Intent Classification
@@ -92,11 +99,7 @@ class SimpleBaseline:
         confidence = float(max(probs))
 
         # 2. Simple Rule-Based Triage
-        escalate_keywords = re.compile(
-            r"\b(stolen|delivered|refund|cancel|hacked|fraud|charge|broken|damaged|lawyer|police|sue|unauthorized)\b", 
-            re.I
-        )
-        if escalate_keywords.search(customer_text):
+        if SIMPLE_ESCALATE_PAT.search(customer_text):
             decision = "ESCALATE"
             category = "ACCOUNT_SPECIFIC_PII_REQUIRED"
             reason = "Simple baseline keyword match detected escalation trigger."

@@ -140,7 +140,7 @@ All three systems were evaluated on an independently hand-verified **Golden Eval
 
 ## 5. Automated Multi-Criteria Quality Rubric & Reply Evaluation
 
-Rather than relying purely on superficial n-gram overlap metrics (such as BLEU or ROUGE, which heavily penalize valid lexical variation), reply generation is evaluated using an explicit, deterministic multi-criteria quality rubric implemented in `src/llm_judge.py` (`ReplyQualityRubric`).
+Rather than relying purely on superficial n-gram overlap metrics (such as BLEU or ROUGE, which heavily penalize valid lexical variation), reply generation is evaluated using an explicit, deterministic multi-criteria quality rubric implemented in `src/quality_rubric.py` (`DeterministicQualityRubric`).
 
 ### Evaluation Dimensions (1–5 Scale)
 1. **Groundedness & Factual Realism (1–5)**:

@@ -166,13 +166,16 @@ HIVER/
 │   ├── taxonomy.py                # 8-intent definitions, priority hierarchy & safety rules
 │   ├── retriever.py               # Fast TF-IDF historical case search index (<100ms SLA)
 │   ├── agent.py                   # Calibrated ML AI Support Agent with stateful memory
-│   ├── api.py                     # Production FastAPI service with OpenAPI endpoints
+│   ├── api.py                     # Production FastAPI service with thread-safe session store
 │   ├── baselines.py               # Baseline 0 (Trivial) and Baseline 1 (Simple)
 │   ├── evaluator.py               # Macro-F1, safety triage metrics, and confusion plotting
-│   ├── llm_judge.py               # Deterministic 4-criteria reply quality rubric
+│   ├── quality_rubric.py          # Deterministic 4-criteria reply quality rubric
 │   ├── failure_analysis.py        # Automated isolation of real edge failures
-│   ├── audit_and_fix.py           # Independent ground-truth relabeling and taxonomy audit
 │   └── cli.py                     # Interactive terminal console for live testing
+│
+├── scripts/
+│   ├── build_golden_set.py        # Offline golden evaluation benchmark builder
+│   └── audit_and_fix.py           # Offline ground-truth relabeling and taxonomy audit
 │
 └── artifacts/
     ├── evaluation_metrics.json    # Complete JSON dump of all computed metrics
