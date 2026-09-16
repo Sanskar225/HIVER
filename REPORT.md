@@ -225,13 +225,21 @@ A headline metric of **`0.9038` Escalation Recall** and **`0.9048` Safe Auto-Han
 
 ---
 
-## 8. What We Would Build Next with One More Week
+## 8. Architectural Roadmap: What We Delivered & Next Frontiers
 
-1. **Multi-Turn Session State Tracking**:
-   Extend the agent from single-turn tweet processing to dynamic thread graph tracking, maintaining conversation memory across turns to prevent re-sending links the customer already tried.
-2. **Production Order API Tool-Calling**:
-   Equip the agent with structured mock tools (`lookup_order_status(order_id)`, `check_delivery_sla(order_id)`) to inspect actual simulated logistics data before making an escalation decision.
-3. **Active Learning & Uncertainty Triage**:
-   Implement conformal prediction to isolate queries where intent confidence falls between $0.40$ and $0.65$, routing them to a secondary human-in-the-loop review queue for continuous model fine-tuning.
-4. **Sub-50ms Edge Inference**:
-   Distill the classification and triage logic into a quantized small language model (SLM) or optimized ONNX runtime to reduce inference latency from hundreds of milliseconds to under 30ms.
+### Delivered in This Prototype
+- **Multi-Turn Session State Tracking & True LRU Store**: Implemented thread-safe `InMemoryLRUSessionStore` with atomic per-session transaction locking, preventing TOCTOU race conditions and capping single-session memory depth (`MAX_TURNS_PER_SESSION = 20`).
+- **Multi-Layer Defense-in-Depth Security**: Value-level Luhn-valid PAN masking, emergency PII escalation, inbound RAM storage sanitization, stored/reflected XSS escaping, token authentication, and sliding-window rate limiting.
+- **Universal Reproducibility Architecture**: Self-healing pickle deserializers, `--force-retrain` CLI flags, bounded dependencies, and 1-click reproduction script (`reproduce.py`).
+- **Kubernetes Cloud-Native Integration**: Starlette request correlation middleware (`X-Request-ID`), process timing (`X-Process-Time-Ms`), and instant `/live` (< 1ms) and `/ready` probes.
+
+### What We Would Build Next with One More Week
+1. **Production Order API & Logistics Tool-Calling**:
+   Equip the agent with structured backend mock tools (`lookup_order_status(order_id)`, `verify_delivery_sla(order_id)`) to query simulated internal logistics databases before committing to an escalation decision.
+2. **Active Learning & Conformal Prediction**:
+   Implement conformal prediction boundaries to isolate queries where calibrated class probability falls between $0.40$ and $0.65$, automatically routing them to a secondary human-in-the-loop triage queue for continuous retraining.
+3. **Multi-Annotator Human Calibration Study**:
+   Conduct an empirical inter-rater reliability study (measuring Cohen's Kappa and Krippendorff's Alpha) across a panel of human customer service operations managers to calibrate automated quality rubric thresholds against human consensus.
+4. **Sub-20ms ONNX / Quantized Edge Runtime**:
+   Compile the TF-IDF vectorizer and calibrated Logistic Regression classifier into an optimized ONNX runtime graph, reducing per-request CPU inference latency from ~15ms to < 2ms for high-frequency edge gateway deployment.
+

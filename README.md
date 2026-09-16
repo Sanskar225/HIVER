@@ -48,20 +48,20 @@ pip install -r requirements.txt
 ```
 
 ### 2. ⚡ 1-Click Master Reproduction (< 1 Minute)
-Run the all-in-one verification script to check environment, run all 50 tests, and reproduce the benchmark pipeline:
+Run the all-in-one verification script to check environment, run all 57 tests, and reproduce the benchmark pipeline:
 ```bash
 python reproduce.py
 # or via Make:
 make reproduce
 ```
 
-### 3. Run the Automated Pytest Suite (50 Verification Tests)
+### 3. Run the Automated Pytest Suite (57 Verification Tests)
 ```bash
 python -m pytest tests/ -v
 # or via Make:
 make test
 ```
-Executes in ~15 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, negation handling, calibrated confidence gating on OOD inputs, reply sanitization, value-level PII scrubbing, stored XSS escaping, rate limiting, self-healing pickle fallback, and FastAPI endpoints.
+Executes with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, negation handling, calibrated confidence gating on OOD inputs, reply sanitization, value-level PII scrubbing, stored/reflected XSS escaping, rate limiting, self-healing pickle fallback, atomic session locking, True LRU eviction, and Kubernetes `/live` and `/ready` probes.
 
 ### 4. Run the Full Evaluation Pipeline (Cached or Scratch Retrain)
 ```bash
@@ -107,7 +107,7 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000
 # or via Make:
 make run-api
 ```
-Interactive OpenAPI/Swagger documentation available at `http://localhost:8000/docs`. Supports stateful multi-turn conversation tracking (`/v1/chat`), high-speed queue routing (`/v1/triage`), and system health status (`/health`).
+Interactive OpenAPI/Swagger documentation available at `http://localhost:8000/docs`. Supports stateful multi-turn conversation tracking (`/v1/chat`) with atomic session transaction locking, high-speed queue routing (`/v1/triage`), system health status (`/health`), and Kubernetes probes (`/live`, `/ready`).
 
 ---
 
@@ -157,17 +157,23 @@ Interactive OpenAPI/Swagger documentation available at `http://localhost:8000/do
 HIVER/
 ├── README.md                      # Marketing page, quickstart, and headline benchmark table
 ├── REPORT.md                      # Comprehensive 6-page technical report with mandatory sections
-├── DECISION_LOG.md                # 16 non-obvious engineering decisions and their rationales
-├── requirements.txt               # Lightweight Python dependencies (including pytest, fastapi)
-├── run_pipeline.py                # Master reproduction script (typically < 1 minute)
+├── DECISION_LOG.md                # 23 non-obvious engineering decisions and their rationales
+├── requirements.txt               # Lightweight bounded Python dependencies
+├── pyproject.toml                 # Standardized packaging configuration
+├── Makefile                       # Developer shortcuts (test, reproduce, retrain, run-api)
+├── reproduce.py                   # 1-Click Master Reproduction script (under 1 minute)
+├── run_pipeline.py                # Evaluation pipeline with --force-retrain support
 │
-├── tests/                         # Full automated test suite (31 unit & safety tests)
-│   ├── test_agent.py              # End-to-end agent behavior, routing & credential sanitization
-│   ├── test_api.py                # FastAPI endpoints (/health, /v1/triage, /v1/chat)
-│   ├── test_data_leakage.py       # Zero conversation ID & customer text overlap checks
-│   ├── test_evaluator.py          # Metric calculations & deterministic reply rubric tests
-│   ├── test_retriever.py          # TF-IDF retrieval accuracy & sub-100ms latency SLA
-│   └── test_taxonomy.py           # Hierarchy priority & collision resolution checks
+├── tests/                         # Full automated test suite (57 unit, safety, & stress tests)
+│   ├── test_agent.py              # End-to-end agent behavior, routing, negation, OOD gating (16 tests)
+│   ├── test_api.py                # FastAPI endpoints (/health, /v1/triage, /v1/chat) (3 tests)
+│   ├── test_api_concurrency.py    # Concurrency, atomic session locks, True LRU, K8s probes (7 tests)
+│   ├── test_data_leakage.py       # Zero conversation ID & customer text overlap checks (3 tests)
+│   ├── test_evaluator.py          # Metric calculations & deterministic reply rubric tests (4 tests)
+│   ├── test_reproducibility.py    # Dataset integrity, scratch retraining, self-healing pickle (5 tests)
+│   ├── test_retriever.py          # TF-IDF retrieval accuracy & sub-100ms latency SLA (2 tests)
+│   ├── test_security_pii.py       # PAN/CVV masking, stored/reflected XSS, auth & rate limiting (9 tests)
+│   └── test_taxonomy.py           # Hierarchy priority & collision resolution checks (8 tests)
 │
 ├── data/
 │   ├── raw/                       # Original multi-turn conversation dataset
