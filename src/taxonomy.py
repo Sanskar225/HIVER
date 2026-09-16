@@ -105,8 +105,42 @@ HIGH_RISK_PATTERNS = {
         r"representative|lawyer|attorney|police|court|legal action|consumer court|"
         r"better business bureau|bbb complaint|lawsuit|unacceptable service|furious|disgusted)\b",
         re.I
+    ),
+    "ACCOUNT_SPECIFIC_PII_REQUIRED": re.compile(
+        r"\b(?:\d{4}[- ]?){3}\d{4}\b|"
+        r"\b3[47]\d{2}[- ]?\d{6}[- ]?\d{5}\b|"
+        r"\b(?:cvv|cvc|security code|cid)\s*[:=]?\s*\d{3,4}\b|"
+        r"\b\d{3}-\d{2}-\d{4}\b|"
+        r"\b(?:password|passwd)\s*[:=]?\s*\S+\b",
+        re.I
     )
 }
+
+# Comprehensive Value-Level PII Scrubbing Patterns (PCI-DSS & GDPR Compliance)
+CARD_PAN_PAT = re.compile(
+    r"\b(?:\d{4}[- ]?){3}\d{4}\b|"  # 16-digit Visa/Mastercard/Discover/Rupay
+    r"\b3[47]\d{2}[- ]?\d{6}[- ]?\d{5}\b"  # 15-digit Amex
+)
+CVV_CODE_PAT = re.compile(r"\b(?:cvv|cvc|security code|cid)\s*[:=]?\s*\d{3,4}\b", re.I)
+SSN_PAT = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
+EMAIL_PAT = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b")
+PHONE_PAT = re.compile(r"(?<!\d)(?<!\d-)(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}(?!-\d)(?!\d)")
+PII_LABEL_PAT = re.compile(r"(?<!\[)\b(credit card|cvv|password|full card number)\b(?!-redacted\])", re.I)
+
+def mask_pii(text: str) -> str:
+    """
+    Scrubs sensitive PII values (credit card PANs, CVVs, SSNs, phone numbers, emails)
+    and credential labels from text, rendering it safe for storage, logging, and transmission.
+    """
+    if not text:
+        return ""
+    text = CARD_PAN_PAT.sub("[card-redacted]", text)
+    text = CVV_CODE_PAT.sub("[cvv-redacted]", text)
+    text = SSN_PAT.sub("[ssn-redacted]", text)
+    text = EMAIL_PAT.sub("[email-redacted]", text)
+    text = PHONE_PAT.sub("[phone-redacted]", text)
+    text = PII_LABEL_PAT.sub("[redacted]", text)
+    return text
 
 # Negation scope patterns to prevent false keyword triggers
 NEGATION_BILLING_PAT = re.compile(

@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from src.config import PROCESSED_DATA_DIR, ARTIFACTS_DIR
+from src.taxonomy import mask_pii
 
 logger = logging.getLogger(__name__)
 
@@ -76,8 +77,8 @@ class HistoricalRetriever:
             row = self.df_kb.iloc[idx]
             results.append({
                 "conversation_id": row["conversation_id"],
-                "customer_text": row["customer_text"],
-                "support_reply": row["support_reply"],
+                "customer_text": mask_pii(str(row["customer_text"])),
+                "support_reply": mask_pii(str(row["support_reply"])),
                 "similarity_score": round(score, 4)
             })
         return results

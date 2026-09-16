@@ -11,6 +11,7 @@ env/
 # Large raw datasets (> 100MB exceeds GitHub limits)
 data/raw/
 *.parquet
+!data/processed/*.parquet
 
 # Python checkpoints / IDE
 .vscode/

@@ -37,7 +37,8 @@ from src.taxonomy import (
     NEGATION_REFUND_PAT,
     resolve_intent_collision,
     evaluate_deterministic_risk,
-    detect_domain_intents
+    detect_domain_intents,
+    mask_pii
 )
 from src.retriever import HistoricalRetriever
 
@@ -104,7 +105,6 @@ CREDENTIAL_SOLICIT_PAT = re.compile(
     re.I
 )
 
-PII_REDACT_PAT = re.compile(r"\b(credit card|cvv|password|full card number)\b", re.I)
 AGENT_TAG_SUFFIX_PAT = re.compile(r"\^[a-zA-Z]{2,3}$")
 NORMALIZE_USER_PAT = re.compile(r"@\d+")
 NORMALIZE_URL_PAT = re.compile(r"https?://\S+")
@@ -430,6 +430,12 @@ class AmazonSupportAgent:
                     "I'm truly sorry your order arrived damaged! We want to make this right immediately. "
                     f"Please send us a direct message with your order number via [link] so an account specialist can investigate and arrange a replacement or refund for you. {agent_tag}"
                 )
+            elif escalation_cat == "ACCOUNT_SPECIFIC_PII_REQUIRED":
+                return (
+                    "For your security, please delete any personal or payment details posted publicly immediately. "
+                    "We take privacy very seriously and never ask for credentials on a public feed. "
+                    f"Please connect with an account specialist privately through our verified portal at [link]. {agent_tag}"
+                )
             else: # Customer agitation, legal threat, or explicit human agent request
                 if HUMAN_REP_INQUIRY_PAT.search(customer_text):
                     return (
@@ -472,11 +478,12 @@ class AmazonSupportAgent:
         """
         Final Safety & Privacy Guardrail:
         - Ensures no public solicitation of sensitive customer data.
+        - Redacts actual credit card PANs, CVVs, SSNs, and passwords via mask_pii().
         - Guarantees valid sanitized link placeholders.
         - Appends brand sign-off if omitted.
         """
         cleaned = CREDENTIAL_SOLICIT_PAT.sub("please connect privately via our secure link [link]", reply)
-        cleaned = PII_REDACT_PAT.sub("[redacted]", cleaned)
+        cleaned = mask_pii(cleaned)
         if not AGENT_TAG_SUFFIX_PAT.search(cleaned.strip()):
             cleaned = cleaned.strip() + " ^CS"
         return cleaned
@@ -508,7 +515,7 @@ class AmazonSupportAgent:
                     "decision": DECISION_ESCALATE,
                     "escalation_category": last_turn.get("escalation_category", "ACCOUNT_SPECIFIC_PII_REQUIRED"),
                     "reason": "Multi-turn context: customer provided order number for active escalation inquiry.",
-                    "reply": "Thank you for providing your order details. An account specialist has received your information and is actively reviewing the trace. We will update you via secure channel. ^CS",
+                    "reply": "Thank you for providing your order details. For your security, please delete any public tweets containing your order ID. An account specialist has received your information and is actively reviewing the trace. We will update you via secure channel. ^CS",
                     "evidence": [],
                     "multi_turn": True
                 }
@@ -522,7 +529,8 @@ class AmazonSupportAgent:
             {
                 "conversation_id": h["conversation_id"],
                 "similarity": h["similarity_score"],
-                "support_reply": h["support_reply"]
+                "support_reply": h["support_reply"],
+                "customer_text": mask_pii(h.get("customer_text", ""))
             }
             for h in hits
         ]

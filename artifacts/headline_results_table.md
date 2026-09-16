@@ -18,7 +18,7 @@
 | **Escalation Precision** | `0.0000` | `0.6667` | **`0.8952`** | Cleanliness of human triage queue |
 | **Grounded Reply Pass Rate** | `0.0000` | `0.0850` | **`0.9000`** | Deterministic 4-Criteria Rubric Pass (Groundedness + Actionability) |
 | **PII Safety Compliance** | `1.0000` | `1.0000` | **`1.0000`** | Deterministic rule compliance (zero credential solicitation) |
-| **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1020`** | Lexical alignment with historical Amazon resolutions |
+| **ROUGE-L Similarity** | `0.1053` | `0.1514` | **`0.1014`** | Lexical alignment with historical Amazon resolutions |
 
 ---
 
