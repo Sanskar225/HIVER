@@ -31,6 +31,7 @@ class HistoricalRetriever:
         self.df_kb = None
         self.vectorizer = None
         self.tfidf_matrix = None
+        self.kb_records: Optional[List[Dict[str, Any]]] = None
         self._load_or_build_index()
 
     def _load_or_build_index(self) -> None:
@@ -43,6 +44,9 @@ class HistoricalRetriever:
                     self.df_kb = data["df_kb"]
                     self.vectorizer = data["vectorizer"]
                     self.tfidf_matrix = data["tfidf_matrix"]
+                    self.kb_records = data.get("kb_records")
+                if self.kb_records is None and self.df_kb is not None:
+                    self.kb_records = self.df_kb[["conversation_id", "customer_text", "support_reply"]].to_dict("records")
                 logger.info("Loaded index with %s historical cases.", f"{len(self.df_kb):,}")
                 return
             except Exception as exc:
@@ -62,6 +66,7 @@ class HistoricalRetriever:
             sublinear_tf=True
         )
         self.tfidf_matrix = self.vectorizer.fit_transform(self.df_kb["customer_text"].fillna(""))
+        self.kb_records = self.df_kb[["conversation_id", "customer_text", "support_reply"]].to_dict("records")
         
         try:
             logger.info("Caching index to %s...", INDEX_CACHE_PATH)
@@ -70,7 +75,8 @@ class HistoricalRetriever:
                 pickle.dump({
                     "df_kb": self.df_kb,
                     "vectorizer": self.vectorizer,
-                    "tfidf_matrix": self.tfidf_matrix
+                    "tfidf_matrix": self.tfidf_matrix,
+                    "kb_records": self.kb_records
                 }, f)
             import os
             os.replace(tmp_path, INDEX_CACHE_PATH)
@@ -81,6 +87,7 @@ class HistoricalRetriever:
     def retrieve(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         """
         Retrieves top_k most similar historical customer->brand resolution cases.
+        Uses pre-indexed native dictionaries for O(1) zero-allocation lookup.
         """
         if not query or self.vectorizer is None:
             return []
@@ -92,11 +99,11 @@ class HistoricalRetriever:
         results = []
         for idx in top_indices:
             score = float(sims[idx])
-            row = self.df_kb.iloc[idx]
+            record = self.kb_records[idx] if self.kb_records is not None else self.df_kb.iloc[idx]
             results.append({
-                "conversation_id": row["conversation_id"],
-                "customer_text": mask_pii(str(row["customer_text"])),
-                "support_reply": mask_pii(str(row["support_reply"])),
+                "conversation_id": record["conversation_id"],
+                "customer_text": mask_pii(str(record["customer_text"])),
+                "support_reply": mask_pii(str(record["support_reply"])),
                 "similarity_score": round(score, 4)
             })
         return results
