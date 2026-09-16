@@ -19,9 +19,15 @@ logger = logging.getLogger(__name__)
 INDEX_CACHE_PATH = ARTIFACTS_DIR / "tfidf_retriever_index.pkl"
 
 class HistoricalRetriever:
-    def __init__(self, kb_path: Optional[Path] = None, max_features: int = 50000):
+    def __init__(
+        self, 
+        kb_path: Optional[Path] = None, 
+        max_features: int = 50000,
+        force_rebuild: bool = False
+    ):
         self.kb_path = kb_path or (PROCESSED_DATA_DIR / "kb_corpus.parquet")
         self.max_features = max_features
+        self.force_rebuild = force_rebuild
         self.df_kb = None
         self.vectorizer = None
         self.tfidf_matrix = None
@@ -29,15 +35,21 @@ class HistoricalRetriever:
 
     def _load_or_build_index(self) -> None:
         ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
-        if INDEX_CACHE_PATH.exists():
-            logger.info("Loading cached retrieval index from %s...", INDEX_CACHE_PATH)
-            with open(INDEX_CACHE_PATH, "rb") as f:
-                data = pickle.load(f)
-                self.df_kb = data["df_kb"]
-                self.vectorizer = data["vectorizer"]
-                self.tfidf_matrix = data["tfidf_matrix"]
-            logger.info("Loaded index with %s historical cases.", f"{len(self.df_kb):,}")
-            return
+        if not self.force_rebuild and INDEX_CACHE_PATH.exists():
+            try:
+                logger.info("Loading cached retrieval index from %s...", INDEX_CACHE_PATH)
+                with open(INDEX_CACHE_PATH, "rb") as f:
+                    data = pickle.load(f)
+                    self.df_kb = data["df_kb"]
+                    self.vectorizer = data["vectorizer"]
+                    self.tfidf_matrix = data["tfidf_matrix"]
+                logger.info("Loaded index with %s historical cases.", f"{len(self.df_kb):,}")
+                return
+            except Exception as exc:
+                logger.warning(
+                    "Retriever cache incompatible or corrupted (%s). Self-healing: rebuilding index from %s...",
+                    exc, self.kb_path
+                )
 
         logger.info("Building TF-IDF index from %s...", self.kb_path)
         self.df_kb = pd.read_parquet(self.kb_path)
@@ -51,14 +63,20 @@ class HistoricalRetriever:
         )
         self.tfidf_matrix = self.vectorizer.fit_transform(self.df_kb["customer_text"].fillna(""))
         
-        logger.info("Caching index to %s...", INDEX_CACHE_PATH)
-        with open(INDEX_CACHE_PATH, "wb") as f:
-            pickle.dump({
-                "df_kb": self.df_kb,
-                "vectorizer": self.vectorizer,
-                "tfidf_matrix": self.tfidf_matrix
-            }, f)
-        logger.info("Index built and cached successfully.")
+        try:
+            logger.info("Caching index to %s...", INDEX_CACHE_PATH)
+            tmp_path = INDEX_CACHE_PATH.with_suffix(".tmp")
+            with open(tmp_path, "wb") as f:
+                pickle.dump({
+                    "df_kb": self.df_kb,
+                    "vectorizer": self.vectorizer,
+                    "tfidf_matrix": self.tfidf_matrix
+                }, f)
+            import os
+            os.replace(tmp_path, INDEX_CACHE_PATH)
+            logger.info("Index built and cached successfully.")
+        except Exception as exc:
+            logger.warning("Could not cache index to %s (%s). Index remains active in memory.", INDEX_CACHE_PATH, exc)
 
     def retrieve(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         """

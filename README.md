@@ -43,26 +43,42 @@ We built an evaluation-first AI customer support prototype for **`@AmazonHelp`**
 git clone https://github.com/Sanskar225/HIVER.git
 cd HIVER
 
-# Install dependencies
+# Install dependencies (pinned & bounded for Python 3.9 - 3.14)
 pip install -r requirements.txt
 ```
 
-### 2. Run the Automated Pytest Suite (35 Verification Tests)
+### 2. ⚡ 1-Click Master Reproduction (< 1 Minute)
+Run the all-in-one verification script to check environment, run all 50 tests, and reproduce the benchmark pipeline:
+```bash
+python reproduce.py
+# or via Make:
+make reproduce
+```
+
+### 3. Run the Automated Pytest Suite (50 Verification Tests)
 ```bash
 python -m pytest tests/ -v
+# or via Make:
+make test
 ```
-Executes in ~20 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, negation handling, calibrated confidence gating on OOD inputs, reply sanitization, multi-turn continuity, and FastAPI endpoints.
+Executes in ~15 seconds with zero external network calls: verifies zero data leakage, sub-100ms retrieval latency SLA, taxonomy collision precedence, negation handling, calibrated confidence gating on OOD inputs, reply sanitization, value-level PII scrubbing, stored XSS escaping, rate limiting, self-healing pickle fallback, and FastAPI endpoints.
 
-### 3. Run the Full Evaluation Pipeline (Typically < 1 Minute)
+### 4. Run the Full Evaluation Pipeline (Cached or Scratch Retrain)
 ```bash
+# Fast evaluation using cached artifacts (< 25s):
 python run_pipeline.py
+
+# Or force-rebuild TF-IDF index & retrain ML classifier from scratch:
+python run_pipeline.py --force-retrain
+# or via Make:
+make retrain
 ```
 This executes predictions across all 200 Golden Evaluation examples for Baseline 0, Baseline 1, and the Proposed Agent, evaluates deterministic reply quality rubric criteria, and outputs:
 - `artifacts/evaluation_metrics.json`
 - `artifacts/headline_results_table.md`
 - `artifacts/confusion_matrix_*.png`
 
-### 4. Interactive CLI Demo (Try It Live!)
+### 5. Interactive CLI Demo (Try It Live!)
 ```bash
 python -m src.cli "Package says delivered yesterday but it was never left on my porch!"
 ```
@@ -85,9 +101,11 @@ python -m src.cli "Package says delivered yesterday but it was never left on my 
 }
 ```
 
-### 5. Launch Production FastAPI Microservice
+### 6. Launch Production FastAPI Microservice
 ```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000
+# or via Make:
+make run-api
 ```
 Interactive OpenAPI/Swagger documentation available at `http://localhost:8000/docs`. Supports stateful multi-turn conversation tracking (`/v1/chat`), high-speed queue routing (`/v1/triage`), and system health status (`/health`).
 

@@ -18,7 +18,7 @@ from src.agent import AmazonSupportAgent
 from src.evaluator import evaluate_system
 from src.quality_rubric import DeterministicQualityRubric, evaluate_reply_batch
 
-def run_pipeline(reproduce: bool = True):
+def run_pipeline(reproduce: bool = True, force_retrain: bool = False):
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     print("="*90)
@@ -39,10 +39,12 @@ def run_pipeline(reproduce: bool = True):
     print(f"Triage: {golden_df['golden_triage'].value_counts().to_dict()}")
 
     print("\n[Step 2/5] Initializing Knowledge Base & Models...")
-    retriever = HistoricalRetriever()
+    if force_retrain:
+        print("  [--force-retrain active] Rebuilding TF-IDF index and retraining ML model from scratch...")
+    retriever = HistoricalRetriever(force_rebuild=force_retrain)
     trivial_base = TrivialBaseline()
     simple_base = SimpleBaseline(retriever=retriever)
-    agent = AmazonSupportAgent(retriever=retriever)
+    agent = AmazonSupportAgent(retriever=retriever, force_retrain=force_retrain)
 
     print("\n[Step 3/5] Running Predictions across Golden Set...")
     print("  Running Baseline 0 (Trivial: Majority + Constant Rule)...")
@@ -151,4 +153,13 @@ def run_pipeline(reproduce: bool = True):
     return full_metrics
 
 if __name__ == "__main__":
-    run_pipeline()
+    import argparse
+    parser = argparse.ArgumentParser(description="Master Evaluation & Reproduction Pipeline for @AmazonHelp")
+    parser.add_argument(
+        "--force-retrain", "--rebuild-cache",
+        dest="force_retrain",
+        action="store_true",
+        help="Force rebuild of retrieval index and intent classifier from scratch."
+    )
+    args = parser.parse_args()
+    run_pipeline(force_retrain=args.force_retrain)

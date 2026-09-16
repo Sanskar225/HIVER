@@ -217,9 +217,11 @@ class AmazonSupportAgent:
     def __init__(
         self, 
         retriever: Optional[HistoricalRetriever] = None, 
-        model_name: str = "calibrated-ml-hybrid"
+        model_name: str = "calibrated-ml-hybrid",
+        force_retrain: bool = False
     ):
-        self.retriever = retriever or HistoricalRetriever()
+        self.force_retrain = force_retrain
+        self.retriever = retriever or HistoricalRetriever(force_rebuild=force_retrain)
         self.model_name = model_name
         self.vectorizer: Optional[TfidfVectorizer] = None
         self.classifier: Optional[LogisticRegression] = None
@@ -228,12 +230,18 @@ class AmazonSupportAgent:
     def _train_or_load_classifier(self) -> None:
         """Loads or trains a calibrated TF-IDF + Logistic Regression intent classifier."""
         ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
-        if AGENT_MODEL_CACHE_PATH.exists():
-            with open(AGENT_MODEL_CACHE_PATH, "rb") as f:
-                data = pickle.load(f)
-                self.vectorizer = data["vectorizer"]
-                self.classifier = data["classifier"]
-            return
+        if not self.force_retrain and AGENT_MODEL_CACHE_PATH.exists():
+            try:
+                with open(AGENT_MODEL_CACHE_PATH, "rb") as f:
+                    data = pickle.load(f)
+                    self.vectorizer = data["vectorizer"]
+                    self.classifier = data["classifier"]
+                return
+            except Exception as exc:
+                logger.warning(
+                    "Agent model cache incompatible or corrupted (%s). Self-healing: retraining stratified calibrated model from corpus...",
+                    exc
+                )
 
         logger.info("Training Calibrated Stratified TF-IDF + Logistic Regression Intent Classifier...")
         class_buckets: Dict[str, List[str]] = {c: [] for c in DOMAIN_INTENT_PATTERNS}
@@ -278,12 +286,18 @@ class AmazonSupportAgent:
         )
         self.classifier.fit(X, labels)
 
-        with open(AGENT_MODEL_CACHE_PATH, "wb") as f:
-            pickle.dump({
-                "vectorizer": self.vectorizer,
-                "classifier": self.classifier
-            }, f)
-        logger.info("Calibrated model trained and cached successfully.")
+        try:
+            tmp_model_path = AGENT_MODEL_CACHE_PATH.with_suffix(".tmp")
+            with open(tmp_model_path, "wb") as f:
+                pickle.dump({
+                    "vectorizer": self.vectorizer,
+                    "classifier": self.classifier
+                }, f)
+            import os
+            os.replace(tmp_model_path, AGENT_MODEL_CACHE_PATH)
+            logger.info("Calibrated model trained and cached successfully.")
+        except Exception as exc:
+            logger.warning("Could not cache model to %s (%s). Model remains active in memory.", AGENT_MODEL_CACHE_PATH, exc)
 
     def preprocess(self, text: str) -> str:
         """Normalizes user handles, urls, and redundant whitespace."""
